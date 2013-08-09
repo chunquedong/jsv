@@ -17,9 +17,8 @@ import chunquedong.jsv.record.connect.DbUtil;
 import chunquedong.jsv.record.model.*;
 
 public class SqlUtil {
-	public static Object getInstance(Schema s, ResultSet r)
+	public static boolean fillToObj(Schema s, Object obj, ResultSet r)
 	{
-		Object obj = s.newInstance();
 		try {
 			for (int i=0; i<s.size(); ++i) {
 				Field f = s.get(i);
@@ -27,10 +26,10 @@ public class SqlUtil {
 				val = r.getObject(i+1);
 				f.setValue(obj, val);
 			}
+			return true;
 		} catch (SQLException e) {
-			return new RuntimeException(e);
+			throw new RuntimeException(e);
 		}
-		return obj;
 	}
 	
 	public static boolean checkMatchDb(Schema s, ResultSet tcols) {

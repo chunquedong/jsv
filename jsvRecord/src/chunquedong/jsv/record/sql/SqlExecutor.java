@@ -87,9 +87,16 @@ public class SqlExecutor {
 	public List<Object> select(Schema table, Connection db, Object obj
 			, String orderby, int offset, int limit)
 	{
-		String sql = SelectMaker.getSql(table) + WhereMaker.getSql(table, obj);
-		if (!orderby.isEmpty()) sql += " " + orderby;
+		StringBuilder sqlBuilder = new StringBuilder();
+		SelectMaker.getSql(sqlBuilder, table);
+		WhereMaker.getSql(sqlBuilder, table, obj);
+		if (!orderby.isEmpty()) sqlBuilder.append(" ").append(orderby);
+		if (offset != 0 || limit != -1) {
+			sqlBuilder.append(" limit ").append(offset).append(",").append(limit);
+		}
 		Object[] params = WhereMaker.getParam(table, obj);
+		
+		String sql = sqlBuilder.toString();
 		if (log.isLoggable(Level.FINE))
 		{
 			log.fine(sql);
@@ -104,13 +111,14 @@ public class SqlExecutor {
 			for (int i=0; i<params.length; ++i) {
 				stmt.setObject(i+1, params[i]);
 			}
-			stmt.setMaxRows(offset+limit);
+			//stmt.setMaxRows(offset+limit);
 			set = stmt.executeQuery();
-			set.absolute(offset);
+			//set.absolute(offset);
 			while (set.next())
 			{
-				Object v = SqlUtil.getInstance(table, set);
-				list.add(v);
+				Object tobj = table.newInstance();
+				SqlUtil.fillToObj(table, tobj, set);
+				list.add(tobj);
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -124,9 +132,13 @@ public class SqlExecutor {
 	public Object selectOne(Schema table, Connection db, Object obj
 			, String orderby)
 	{
-		String sql = SelectMaker.getSql(table) + WhereMaker.getSql(table, obj);
-		if (!orderby.isEmpty()) sql += " " + orderby;
+		StringBuilder sqlBuilder = new StringBuilder();
+		SelectMaker.getSql(sqlBuilder, table);
+		WhereMaker.getSql(sqlBuilder, table, obj);
+		if (!orderby.isEmpty()) sqlBuilder.append(" ").append(orderby);
 		Object[] params = WhereMaker.getParam(table, obj);
+		
+		String sql = sqlBuilder.toString();
 		if (log.isLoggable(Level.FINE))
 		{
 			log.fine(sql);
@@ -140,12 +152,13 @@ public class SqlExecutor {
 			for (int i=0; i<params.length; ++i) {
 				stmt.setObject(i+1, params[i]);
 			}
-			stmt.setMaxRows(1);
+			//stmt.setMaxRows(1);
 			set = stmt.executeQuery();
 			if (set.next())
 			{
-				Object v = SqlUtil.getInstance(table, set);
-				return v;
+				Object tobj = table.newInstance();
+				SqlUtil.fillToObj(table, tobj, set);
+				return tobj;
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -159,8 +172,15 @@ public class SqlExecutor {
 	public List<Object> selectWhere(Schema table, Connection db, String condition
 			, int offset, int limit)
 	{
-		String sql = SelectMaker.getSql(table) + " from " + table.getName();
-		if (!condition.isEmpty()) sql += " " + condition;
+		StringBuilder sqlBuilder = new StringBuilder();
+		SelectMaker.getSql(sqlBuilder, table);
+		sqlBuilder.append(" from ").append(table.getName());
+		if (!condition.isEmpty()) sqlBuilder.append(" ").append(condition);
+		if (offset != 0 || limit != -1) {
+			sqlBuilder.append(" limit ").append(offset).append(",").append(limit);
+		}
+		
+		String sql = sqlBuilder.toString();
 		if (log.isLoggable(Level.FINE))
 		{
 			log.fine(sql);
@@ -171,13 +191,14 @@ public class SqlExecutor {
 		List<Object> list = new ArrayList<Object>();
 		try {
 			stmt = db.createStatement();
-			stmt.setMaxRows(offset+limit);
+			//stmt.setMaxRows(offset+limit);
 			set = stmt.executeQuery(sql);
-			set.absolute(offset);
+			//set.absolute(offset);
 			while (set.next())
 			{
-				Object v = SqlUtil.getInstance(table, set);
-				list.add(v);
+				Object obj = table.newInstance();
+				SqlUtil.fillToObj(table, obj, set);
+				list.add(obj);
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -194,8 +215,12 @@ public class SqlExecutor {
 	
 	public boolean delete(Schema table, Connection db, Object obj)
 	{
-		String sql = "delete " + WhereMaker.getSql(table, obj);
+		StringBuilder sqlBuilder = new StringBuilder();
+		sqlBuilder.append("delete ");
+		WhereMaker.getSql(sqlBuilder, table, obj);
 		Object[] params = WhereMaker.getParam(table, obj);
+		
+		String sql = sqlBuilder.toString();
 		if (log.isLoggable(Level.FINE))
 		{
 			log.fine(sql);
@@ -221,8 +246,18 @@ public class SqlExecutor {
 	
 	public long count(Schema table, Connection db, Object obj)
 	{
-		String sql = "select count(*)" + WhereMaker.getSql(table, obj);
+		StringBuilder sqlBuilder = new StringBuilder();
+		sqlBuilder.append("select count(*)");
+		WhereMaker.getSql(sqlBuilder, table, obj);
 		Object[] params = WhereMaker.getParam(table, obj);
+		
+		String sql = sqlBuilder.toString();
+		if (log.isLoggable(Level.FINE))
+		{
+			log.fine(sql);
+			log.fine(Arrays.toString(params));
+		}
+		
 		PreparedStatement stmt = null;
 		ResultSet set = null;
 		try {
@@ -250,9 +285,10 @@ public class SqlExecutor {
 	////////////////////////////////////////////////////////////////////////
 	
 	private PreparedStatement byIdStmt(Schema table, Connection db
-			, Object id, String before)
+			, Object id, StringBuilder before)
 	{
-		String sql = before + IdWhereMaker.getSql(table);
+		IdWhereMaker.getSql(before, table);
+		String sql = before.toString();
 		Object[] params = IdWhereMaker.getParam(table, id);
 		if (log.isLoggable(Level.FINE))
 		{
@@ -276,7 +312,8 @@ public class SqlExecutor {
 	
 	public boolean removeById(Schema table, Connection db, Object id)
 	{
-		PreparedStatement stmt = byIdStmt(table, db, id, "delete ");
+		StringBuilder sqlBuilder = new StringBuilder("delete ");
+		PreparedStatement stmt = byIdStmt(table, db, id, sqlBuilder);
 		try {
 			return stmt.execute();
 		} catch (SQLException e) {
@@ -286,9 +323,11 @@ public class SqlExecutor {
 		}
 	}
 	
-	public Object findById(Schema table, Connection db, Object id)
+	public boolean loadById(Schema table, Connection db, Object id, Object obj)
 	{
-		PreparedStatement stmt = byIdStmt(table, db, id, SelectMaker.getSql(table));
+		StringBuilder sqlBuilder = new StringBuilder("select ");
+		SelectMaker.getSql(sqlBuilder, table);
+		PreparedStatement stmt = byIdStmt(table, db, id, sqlBuilder);
 
 		ResultSet set = null;
 		try {
@@ -296,8 +335,7 @@ public class SqlExecutor {
 			set = stmt.executeQuery();
 			if (set.next())
 			{
-				Object v = SqlUtil.getInstance(table, set);
-				return v;
+				return SqlUtil.fillToObj(table, obj, set);
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -306,12 +344,13 @@ public class SqlExecutor {
 			DbUtil.colseStatement(stmt);
 		}
 
-		return null;
+		return false;
 	}
 	
 	public boolean existById(Schema table, Connection db, Object id)
 	{
-		PreparedStatement stmt = byIdStmt(table, db, id, "select *");
+		StringBuilder sqlBuilder = new StringBuilder("select *");
+		PreparedStatement stmt = byIdStmt(table, db, id, sqlBuilder);
 		ResultSet set = null;
 		try {
 			stmt.setMaxRows(1);

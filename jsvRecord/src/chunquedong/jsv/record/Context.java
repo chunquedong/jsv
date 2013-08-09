@@ -121,9 +121,10 @@ public class Context {
 	//By ID
 	//////////////////////////////////////////////////////////////////////////
 	
-	public Object findById(Schema table, Object id)
+	public boolean loadById(Schema table, Object obj)
 	{
-		return this.executor.findById(table, this.getConnection(), id);
+		Object id = table.getPk().getValue(obj);
+		return this.executor.loadById(table, this.getConnection(), id, obj);
 	}
 
 	
@@ -170,7 +171,7 @@ public class Context {
 	private boolean existById(Record obj)
 	{
 		Object id = obj.getId();
-		if (findById(obj.getSchema(), id) != null)
+		if (this.executor.existById(obj.getSchema(), this.getConnection(), id))
 		{
 			return true;
 		}

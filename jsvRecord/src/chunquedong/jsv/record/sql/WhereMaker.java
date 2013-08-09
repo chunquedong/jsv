@@ -12,8 +12,7 @@ import chunquedong.jsv.record.model.Field;
 import chunquedong.jsv.record.model.Schema;
 
 public class WhereMaker {
-	public static String getSql(Schema table, Object obj) {
-		StringBuilder sql = new StringBuilder();
+	public static void getSql(StringBuilder sql, Schema table, Object obj) {
 		sql.append(" from ").append(table.getName()).append(" where ");
 
 		boolean isFirst = true;
@@ -28,8 +27,6 @@ public class WhereMaker {
 				isFirst = false;
 			}
 		}
-
-		return sql.toString();
 	}
 	
 	public static Object[] getParam(Schema table, Object obj)

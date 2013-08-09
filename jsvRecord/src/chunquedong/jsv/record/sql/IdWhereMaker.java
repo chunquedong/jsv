@@ -11,13 +11,10 @@ package chunquedong.jsv.record.sql;
 import chunquedong.jsv.record.model.Schema;
 
 public class IdWhereMaker {
-	public static String getSql(Schema table) {
-		StringBuilder sql = new StringBuilder();
+	public static void getSql(StringBuilder sql, Schema table) {
 		sql.append(" from ").append(table.getName()).append(" where ");
 		sql.append(table.getName()).append(".").append(table.getPk().getName());
 		sql.append("=?");
-
-		return sql.toString();
 	}
 	
 	public static Object[] getParam(Schema table, Object obj)

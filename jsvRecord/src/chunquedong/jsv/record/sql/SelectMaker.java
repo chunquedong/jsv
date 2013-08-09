@@ -12,8 +12,7 @@ import chunquedong.jsv.record.model.Field;
 import chunquedong.jsv.record.model.Schema;
 
 public class SelectMaker {
-	public static String getSql(Schema table) {
-		StringBuilder sql = new StringBuilder();
+	public static void getSql(StringBuilder sql, Schema table) {
 		sql.append("select ");
 
 		for (int i=0,n=table.size(); i<n; ++i) {
@@ -24,7 +23,5 @@ public class SelectMaker {
 			sql.append(table.getName()).append(".");
 			sql.append(f.getName());
 		}
-
-		return sql.toString();
 	}
 }
