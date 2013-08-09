@@ -8,7 +8,11 @@
 
 package chunquedong.jsv.record.model;
 
-public class Field {
+import java.io.Serializable;
+
+public class Field implements Serializable {
+  private static final long serialVersionUID = 9591372409452122L;
+
 	private String name;
 	
 	private Class<?> type;
@@ -94,5 +98,10 @@ public class Field {
 			Record r = (Record)obj;
 			r.set(index, val);
 		}
+	}
+	
+	@Override
+	public String toString() {
+		return name + " " + sqlType;
 	}
 }

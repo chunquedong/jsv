@@ -8,14 +8,16 @@
 
 package chunquedong.jsv.record.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Schema {
+public class Schema  implements Serializable {
+  private static final long serialVersionUID = 1404088803985705095L;
 	private List<Field> columns;
-	private Map<String, Integer> map;
+	private transient Map<String, Integer> map;
 	private String name;
 	
 	private int idIndex = -1;
@@ -74,4 +76,8 @@ public class Schema {
 		this.autoGenerateId = autoGenerateId;
 	}
 	
+	@Override
+	public String toString() {
+		return name + ":" + columns;
+	}
 }

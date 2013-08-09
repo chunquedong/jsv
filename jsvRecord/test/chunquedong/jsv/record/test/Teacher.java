@@ -40,5 +40,5 @@ class Teacher {
 	void setImage(byte[] val) { r.set(4, val); }
 	
 	Timestamp getTime() { return new Timestamp((Long)r.get(5)); }
-	void setTime(Timestamp val) { r.set(5, val); }
+	void setTime(Timestamp val) { r.set(5, val.getTime()); }
 }

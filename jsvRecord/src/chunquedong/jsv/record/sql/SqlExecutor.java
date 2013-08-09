@@ -84,7 +84,8 @@ public class SqlExecutor {
 	////////////////////////////////////////////////////////////////////////
 	
 
-	public List<Object> select(Schema table, Connection db, Object obj
+	@SuppressWarnings("unchecked")
+  public <T> List<T> select(Schema table, Connection db, Object obj
 			, String orderby, int offset, int limit)
 	{
 		StringBuilder sqlBuilder = new StringBuilder();
@@ -105,7 +106,7 @@ public class SqlExecutor {
 		
 		PreparedStatement stmt = null;
 		ResultSet set = null;
-		List<Object> list = new ArrayList<Object>();
+		List<T> list = new ArrayList<T>();
 		try {
 			stmt = db.prepareStatement(sql);
 			for (int i=0; i<params.length; ++i) {
@@ -118,7 +119,7 @@ public class SqlExecutor {
 			{
 				Object tobj = table.newInstance();
 				SqlUtil.fillToObj(table, tobj, set);
-				list.add(tobj);
+				list.add((T)tobj);
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -169,7 +170,8 @@ public class SqlExecutor {
 		return null;
 	}
 	
-	public List<Object> selectWhere(Schema table, Connection db, String condition
+	@SuppressWarnings("unchecked")
+  public <T> List<T> selectWhere(Schema table, Connection db, String condition
 			, int offset, int limit)
 	{
 		StringBuilder sqlBuilder = new StringBuilder();
@@ -188,7 +190,7 @@ public class SqlExecutor {
 		
 		Statement stmt = null;
 		ResultSet set = null;
-		List<Object> list = new ArrayList<Object>();
+		List<T> list = new ArrayList<T>();
 		try {
 			stmt = db.createStatement();
 			//stmt.setMaxRows(offset+limit);
@@ -198,7 +200,7 @@ public class SqlExecutor {
 			{
 				Object obj = table.newInstance();
 				SqlUtil.fillToObj(table, obj, set);
-				list.add(obj);
+				list.add((T)obj);
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException(e);

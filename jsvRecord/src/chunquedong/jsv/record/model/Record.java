@@ -8,8 +8,12 @@
 
 package chunquedong.jsv.record.model;
 
-public class Record {
-	private Schema schema;
+import java.io.Serializable;
+import java.util.Arrays;
+
+public class Record implements Serializable {
+  private static final long serialVersionUID = -3152163237643045397L;
+	private transient Schema schema;
 	private Object[] values;
 	
 	public Record(Schema schema) {
@@ -43,5 +47,14 @@ public class Record {
 	
 	public Schema getSchema() {
 		return schema;
+	}
+	
+	public void setSchema(Schema s) {
+		this.schema = s;
+	}
+	
+	@Override
+	public String toString() {
+		return schema.getName() +":"+ Arrays.toString(values);
 	}
 }

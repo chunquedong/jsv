@@ -73,8 +73,8 @@ public class Context {
 	//select
 	//////////////////////////////////////////////////////////////////////////
 	
-	public List<Object> list(Record obj) {
-		return list(obj, "", 0, 50);
+	public List<Record> list(Record obj) {
+		return (List<Record>)list(obj, "", 0, 50);
 	}
 	/** 
 	 * select by example
@@ -82,7 +82,7 @@ public class Context {
 	 * @param orderby
 	 * @return
 	 */
-	public List<Object> list(Record obj, String orderby, int offset, int limit)
+	public List<Record> list(Record obj, String orderby, int offset, int limit)
 	{
 		return executor.select(obj.getSchema(), this.getConnection(), obj, orderby, offset, limit);
 	}
@@ -93,16 +93,16 @@ public class Context {
 	/**
 	 *	select by example and get the first one
 	 */
-	public Object one(Record obj, String orderby)
+	public Record one(Record obj, String orderby)
 	{
-		return executor.selectOne(obj.getSchema(), this.getConnection(), obj, orderby);
+		return (Record)executor.selectOne(obj.getSchema(), this.getConnection(), obj, orderby);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
 	//Select where
 	//////////////////////////////////////////////////////////////////////////
 	
-	public List<Object> select(Schema table, String condition) {
+	public List<Record> select(Schema table, String condition) {
 		return select(table, condition, 0, 50);
 	}
 	/**
@@ -112,7 +112,7 @@ public class Context {
 	 * @param offset
 	 * @return
 	 */
-	public List<Object> select(Schema table, String condition, int offset, int limit)
+	public List<Record> select(Schema table, String condition, int offset, int limit)
 	{
 		return this.executor.selectWhere(table, this.getConnection(), condition, offset, limit);
 	}
@@ -121,7 +121,7 @@ public class Context {
 	//By ID
 	//////////////////////////////////////////////////////////////////////////
 	
-	public boolean loadById(Schema table, Object obj)
+	public boolean loadById(Schema table, Record obj)
 	{
 		Object id = table.getPk().getValue(obj);
 		return this.executor.loadById(table, this.getConnection(), id, obj);

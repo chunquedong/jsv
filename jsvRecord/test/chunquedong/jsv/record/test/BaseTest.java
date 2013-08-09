@@ -87,8 +87,7 @@ public class BaseTest {
 		Assert.assertEquals(t2.getImage()[0], 'k');
 		System.out.println(t2.getTime());
 	}
-
-
+	
 	@Test
 	public void test() {
 		buildTable();
