@@ -13,7 +13,6 @@ import org.junit.Test;
 
 import chunquedong.jsv.record.Context;
 import chunquedong.jsv.record.connect.ConnectionPool;
-import chunquedong.jsv.record.model.Record;
 import chunquedong.jsv.record.model.Schema;
 
 public class BaseTest {
@@ -33,7 +32,7 @@ public class BaseTest {
 	public void setup()
 	{
 		log.setLevel(Level.ALL);
-		table = Teacher.getSchema();
+		table = Teacher.createSchema();
 		String driver = "org.sqlite.JDBC";
 		String url = "jdbc:sqlite:test.db";
 		String userName = "postgres";
@@ -60,8 +59,8 @@ public class BaseTest {
 
 	private void insert()
 	{
-		Record r1 = new Record(table);
-		Teacher t1 = new Teacher(r1);
+		Teacher t1 = new Teacher();
+		t1.init(table);
 		t1.setName("yjd");
 		t1.setAge(26);
 		t1.setWeight(56.9f);
@@ -70,17 +69,16 @@ public class BaseTest {
 		t1.setTime(new Timestamp(System.currentTimeMillis()));
 
 		Assert.assertNull(t1.getId());
-		c.insert(r1);
+		c.insert(t1);
 		Assert.assertNotNull(t1.getId());
 	}
 
 	private void query()
 	{
-		Record r1 = new Record(table);
-		Teacher t1 = new Teacher(r1);
+		Teacher t1 = new Teacher();
+		t1.init(table);
 		t1.setName("yjd");
-		Record r2 = (Record)c.one(r1);
-		Teacher t2 = new Teacher(r2);
+		Teacher t2 = (Teacher)c.one(t1);
 
 		Assert.assertEquals(t2.getAge(), 26);
 		Assert.assertTrue(Math.abs(t2.getWeight()-56.9f) < 1E-5);

@@ -87,7 +87,7 @@ public class Context {
 		return executor.select(obj.getSchema(), this.getConnection(), obj, orderby, offset, limit);
 	}
 	
-	public Object one(Record obj) {
+	public Record one(Record obj) {
 		return one(obj, "");
 	}
 	/**

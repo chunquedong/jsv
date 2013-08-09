@@ -14,19 +14,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Schema  implements Serializable {
+public class Schema implements Serializable {
   private static final long serialVersionUID = 1404088803985705095L;
 	private List<Field> columns;
 	private transient Map<String, Integer> map;
 	private String name;
+	private Class<? extends Record> type;
 	
 	private int idIndex = -1;
 	private boolean autoGenerateId = false;
 	
-	public Schema(String name) {
+	public Schema(String name, Class<? extends Record> type) {
 		columns = new ArrayList<Field>();
 		map = new HashMap<String, Integer>();
 		this.name = name;
+		this.type = type;
+	}
+	
+	public Schema(String name) {
+		this(name, ArrayRecord.class);
 	}
 	
 	public void resetMap() {
@@ -41,8 +47,17 @@ public class Schema  implements Serializable {
 		}
 	}
 	
-	public Object newInstance() {
-		return new Record(this);
+	public Record newInstance() {
+		Record r = null;
+    try {
+	    r = (Record)type.newInstance();
+    } catch (InstantiationException e) {
+	    e.printStackTrace();
+    } catch (IllegalAccessException e) {
+	    e.printStackTrace();
+    }
+		r.init(this);
+		return r;
 	}
 	
 	public Integer getIndex(String name) {

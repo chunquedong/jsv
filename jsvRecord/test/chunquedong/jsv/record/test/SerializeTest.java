@@ -18,10 +18,10 @@ public class SerializeTest {
 	@Test
 	public void test() {
 		
-		Schema table = Teacher.getSchema();
+		Schema table = Teacher.createSchema();
 		
-		Record r1 = new Record(table);
-		Teacher t1 = new Teacher(r1);
+		Teacher t1 = new Teacher();
+		t1.init(table);
 		t1.setName("yjd");
 		t1.setAge(26);
 		t1.setWeight(56.9f);
@@ -30,7 +30,7 @@ public class SerializeTest {
 		t1.setTime(new Timestamp(System.currentTimeMillis()));
 		
 		List<Record> list = new ArrayList<Record>();
-		list.add(r1);
+		list.add(t1);
 		
 	  try {
 	  	ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -42,16 +42,15 @@ public class SerializeTest {
       List<Record> list2 = SerializeUtil.read(is);
       is.close();
       
-      Record r2 = list2.get(0);
-      Schema nt = r2.getSchema();
-      System.out.println(r2);
+      Teacher t2 = (Teacher)list2.get(0);
+      Schema nt = t2.getSchema();
+      System.out.println(t2);
       System.out.println(nt);
       
-  		Teacher t2 = new Teacher(r2);
   		Assert.assertEquals(t2.getAge(), 26);
   		Assert.assertTrue(Math.abs(t2.getWeight()-56.9f) < 1E-5);
   		Assert.assertEquals(t2.getImage()[0], 'k');
-  		Assert.assertEquals(r2.get("name"), "yjd");
+  		Assert.assertEquals(t2.get("name"), "yjd");
   		System.out.println(t2.getTime());
       
 	  } catch (Exception e) {

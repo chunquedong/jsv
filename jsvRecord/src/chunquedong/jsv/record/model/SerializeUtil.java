@@ -50,7 +50,7 @@ public class SerializeUtil {
 	    
 	    for (int i=0; i<size; ++i) {
 	    	Record r = (Record)ois.readObject();
-	    	r.setSchema(nt);
+	    	r._setSchema(nt);
 	    	list.add(r);
 	    }
 	    ois.close();
