@@ -44,7 +44,9 @@ public class SerializeUtil {
 	    } else {
 	    	list = new ArrayList<Record>(size);
 	    }
+	    
 	    Schema nt = (Schema)ois.readObject();
+	    nt.resetMap();
 	    
 	    for (int i=0; i<size; ++i) {
 	    	Record r = (Record)ois.readObject();

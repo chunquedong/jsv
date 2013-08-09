@@ -51,6 +51,7 @@ public class SerializeTest {
   		Assert.assertEquals(t2.getAge(), 26);
   		Assert.assertTrue(Math.abs(t2.getWeight()-56.9f) < 1E-5);
   		Assert.assertEquals(t2.getImage()[0], 'k');
+  		Assert.assertEquals(r2.get("name"), "yjd");
   		System.out.println(t2.getTime());
       
 	  } catch (Exception e) {

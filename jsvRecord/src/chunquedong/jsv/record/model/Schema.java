@@ -29,6 +29,18 @@ public class Schema  implements Serializable {
 		this.name = name;
 	}
 	
+	public void resetMap() {
+		if (map == null) {
+			map = new HashMap<String, Integer>();
+		} else {
+			map.clear();
+		}
+		
+		for (Field f : columns) {
+			map.put(f.getName(), f.getIndex());
+		}
+	}
+	
 	public Object newInstance() {
 		return new Record(this);
 	}
