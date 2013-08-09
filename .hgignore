@@ -1,0 +1,4 @@
+syntax: glob
+jsvRecord/bin
+jsvRoute/bin
+jsvRecord/test.db
