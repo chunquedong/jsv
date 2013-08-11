@@ -17,13 +17,48 @@ import chunquedong.jsv.record.connect.DbUtil;
 import chunquedong.jsv.record.model.*;
 
 public class SqlUtil {
+	private static Object getValue(int i, ResultSet r, int type) throws SQLException {
+		switch (type) {
+		case DataType.jinteger:
+			return r.getInt(i);
+		case DataType.jbyte:
+			return r.getByte(i);
+		case DataType.jshort:
+			return r.getShort(i);
+		case DataType.jlong:
+			return r.getLong(i);
+		case DataType.jboolean:
+			return r.getBoolean(i);
+		case DataType.jstring:
+			return r.getString(i);
+		case DataType.jbyteArray:
+			return r.getBytes(i);
+		case DataType.jdate:
+			return r.getDate(i);
+		case DataType.jtime:
+			return r.getTime(i);
+		case DataType.jtimestamp:
+			return r.getTimestamp(i);
+		case DataType.jdecimal:
+			return r.getBigDecimal(i);
+		case DataType.jdouble:
+			return r.getDouble(i);
+		case DataType.jfloat:
+			return r.getFloat(i);
+		case DataType.jother:
+			return r.getObject(i);
+		default:
+			return r.getObject(i);
+		}
+	}
+	
 	public static boolean fillToObj(Schema s, Object obj, ResultSet r)
 	{
 		try {
 			for (int i=0; i<s.size(); ++i) {
 				Field f = s.get(i);
 				Object val;
-				val = r.getObject(i+1);
+				val = getValue(i+1, r, f.getType());
 				f.setValue(obj, val);
 			}
 			return true;

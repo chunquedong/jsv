@@ -10,12 +10,12 @@ public class Teacher extends ArrayRecord {
 	static Schema createSchema()
 	{
 		Schema schema = new Schema("Teacher", Teacher.class);
-		schema.add(new Field("sid", "integer"));
-		schema.add(new Field("name", "string"));
-		schema.add(new Field("age", "integer"));
-		schema.add(new Field("weight", "float"));
-		schema.add(new Field("image", "blob"));
-		schema.add(new Field("time", "timestamp"));
+		schema.add(new Field("sid", DataType.identity));
+		schema.add(new Field("name", DataType.character+"(128)"));
+		schema.add(new Field("age", DataType.integer));
+		schema.add(new Field("weight", DataType.float_));
+		schema.add(new Field("image", DataType.blob));
+		schema.add(new Field("time", DataType.timestamp));
 		
 		schema.setIdIndex(0);
 		schema.setAutoGenerateId(true);
@@ -31,12 +31,12 @@ public class Teacher extends ArrayRecord {
 	int getAge() { return (Integer)super.get(2); }
 	void setAge(int val) { super.set(2, val); }
 	
-	double getWeight() { return (Double)super.get(3); }
-	void setWeight(double val) { super.set(3, val); }
+	float getWeight() { return (Float)super.get(3); }
+	void setWeight(float val) { super.set(3, val); }
 	
 	byte[] getImage() { return (byte[])super.get(4); }
 	void setImage(byte[] val) { super.set(4, val); }
 	
-	Timestamp getTime() { return new Timestamp((Long)super.get(5)); }
-	void setTime(Timestamp val) { super.set(5, val.getTime()); }
+	Timestamp getTime() { return ((Timestamp)super.get(5)); }
+	void setTime(Timestamp val) { super.set(5, val); }
 }

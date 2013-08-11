@@ -15,7 +15,7 @@ public class Field implements Serializable {
 
 	private String name;
 	
-	private Class<?> type;
+	private int type;
 	private int index = -1;
 	private String sqlType;
 
@@ -25,8 +25,13 @@ public class Field implements Serializable {
 	private boolean indexed = false;
 	
 	public Field(String name, String sqlType) {
+		this(name, sqlType, DataType.sqlTypeToJava(sqlType));
+	}
+	
+	public Field(String name, String sqlType, int type) {
 		this.name = name;
 		this.sqlType	= sqlType;
+		this.type = type;
 	}
 
 	public String getName() {
@@ -37,11 +42,11 @@ public class Field implements Serializable {
 		this.name = name;
 	}
 
-	public Class<?> getType() {
+	public int getType() {
 		return type;
 	}
 
-	public void setType(Class<?> type) {
+	public void setType(int type) {
 		this.type = type;
 	}
 
