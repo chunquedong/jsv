@@ -14,6 +14,6 @@ public class VelocityTest extends Controller {
 		list.add("ArrayList element 4<hr/>");
 		request.setAttribute("list", list);
 		
-		render("./view/example.vm");
+		render();
 	}
 }

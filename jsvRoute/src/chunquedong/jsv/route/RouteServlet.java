@@ -35,7 +35,7 @@ public class RouteServlet extends HttpServlet {
 		
 		String className = "Index";
 
-		String[] pathList = new String[3];
+		String[] pathList = new String[4];
 		int count = splitPath(path, pathList);
 		if (count > 0) {
 			className = pathList[0];
@@ -58,6 +58,16 @@ public class RouteServlet extends HttpServlet {
 	private int splitPath(String path, String[] list) {
 		int i0 = 1;
 		int count = 0;
+		
+		int p1 = path.indexOf('?');
+		if (p1 > 0) {
+			path = path.substring(0, p1);
+		}
+		int p2 = path.lastIndexOf('.');
+		if (p2 > 0) {
+			list[3] = path.substring(p2, path.length()); 
+			path = path.substring(0, p2);
+		}
 		
 		if (path.length() <= 2) {
 			return 0;

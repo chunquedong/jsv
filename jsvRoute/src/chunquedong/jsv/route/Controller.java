@@ -25,6 +25,7 @@ public abstract class Controller	extends HttpServlet {
 	protected HttpServletResponse response;
 	private String[] pathList;
 	private String methodName;
+	private String extName;
 	
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -32,6 +33,10 @@ public abstract class Controller	extends HttpServlet {
 		String param = pathList[2];
 		if (methodName == null) {
 			methodName = "index";
+		}
+		extName = pathList[3];
+		if (extName == null) {
+			extName = ".vm";
 		}
 
 		Method method = getMethod(this, methodName);
@@ -123,6 +128,6 @@ public abstract class Controller	extends HttpServlet {
 	}
 	
 	public void render() {
-		render(this.getClass().getSimpleName() + "/" + methodName + ".vm");
+		render("./view/" + this.getClass().getSimpleName() + "/" + methodName + extName);
 	}
 }

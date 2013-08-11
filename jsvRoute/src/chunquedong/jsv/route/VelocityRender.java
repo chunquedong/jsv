@@ -48,7 +48,7 @@ public class VelocityRender {
 		try
 		{
 			Template template = Velocity.getTemplate(templateFile);
-				template.merge(context, writer);
+			template.merge(context, writer);
 		}
 		catch( ResourceNotFoundException rnfe )
 		{
