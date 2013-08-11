@@ -62,10 +62,20 @@ public abstract class Controller	extends HttpServlet {
 		this.request = request;
 		this.response = response;
 		
-		int paramSize = method.getParameterAnnotations().length;
+		int paramSize = method.getParameterTypes().length;
 		try {
 			if (paramSize == 1) {
-				method.invoke(this, param);
+				if (method.getParameterTypes()[0] == long.class
+						|| method.getParameterTypes()[0] == Long.class) {
+					long l = Long.parseLong(param);
+					method.invoke(this, l);
+				} else if (method.getParameterTypes()[0] == int.class
+						|| method.getParameterTypes()[0] == Integer.class) {
+					int l = Integer.parseInt(param);
+					method.invoke(this, l);
+				} else {
+					method.invoke(this, param);
+				}
 			} else if (paramSize == 0) {
 				method.invoke(this);
 			} else {
