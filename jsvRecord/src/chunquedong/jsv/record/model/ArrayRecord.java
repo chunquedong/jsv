@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class ArrayRecord implements Record {
   private static final long serialVersionUID = -3152163237643045397L;
 	private transient Schema schema;
-	private Object[] values;
+	public Object[] values;
 	
 	public ArrayRecord() {
 	}
