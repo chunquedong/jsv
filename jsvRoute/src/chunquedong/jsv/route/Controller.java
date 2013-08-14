@@ -29,39 +29,55 @@ public abstract class Controller	extends HttpServlet {
 	
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		methodName = pathList[1];
-		String param = pathList[2];
-		if (methodName == null) {
-			methodName = "index";
-		}
-		extName = pathList[3];
-		if (extName == null) {
-			extName = ".vm";
-		}
-
-		Method method = getMethod(this, methodName);
-		if (method == null) {
-			if (param == null && !methodName.equals("index")) {
-				param = methodName;
-				methodName = request.getMethod().toLowerCase();
-				method = getMethod(this, methodName);
-				if (method == null) {
-					response.sendError(HttpServletResponse.SC_NOT_FOUND);
-					return;
-				}
-			} else {
-				response.sendError(HttpServletResponse.SC_NOT_FOUND);
-				return;
-			}
-		}
-		if (!requesetMethodCheck(method, request.getMethod())) {
-			response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+		if (!before()) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
 		
-		this.request = request;
-		this.response = response;
-		
+		try {
+			methodName = pathList[1];
+			String param = pathList[2];
+			if (methodName == null) {
+				methodName = "index";
+			}
+			extName = pathList[3];
+			if (extName == null) {
+				extName = ".vm";
+			}
+	
+			Method method = getMethod(this, methodName);
+			if (method == null) {
+				if (param == null && !methodName.equals("index")) {
+					param = methodName;
+					methodName = request.getMethod().toLowerCase();
+					method = getMethod(this, methodName);
+					if (method == null) {
+						response.sendError(HttpServletResponse.SC_NOT_FOUND);
+						return;
+					}
+				} else {
+					response.sendError(HttpServletResponse.SC_NOT_FOUND);
+					return;
+				}
+			}
+			if (!requesetMethodCheck(method, request.getMethod())) {
+				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
+				return;
+			}
+			
+			this.request = request;
+			this.response = response;
+			
+		  invoke(method, param);
+		  
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		} finally {
+			after();
+		}
+	}
+	
+	private void invoke(Method method, String param) throws IOException {
 		int paramSize = method.getParameterTypes().length;
 		try {
 			if (paramSize == 1) {
@@ -131,6 +147,13 @@ public abstract class Controller	extends HttpServlet {
 			}
 		}
 		return null;
+	}
+	
+	public boolean before() {
+		return true;
+	}
+	
+	public void after() {
 	}
 	
 	public void render(String templateFile) {

@@ -27,4 +27,5 @@ public interface Record extends Serializable {
 	public Schema getSchema();
 	
 	public void _setSchema(Schema s);
+	
 }
