@@ -172,7 +172,7 @@ public class SqlExecutor {
 	
 	@SuppressWarnings("unchecked")
   public <T> List<T> selectWhere(Schema table, Connection db, String condition
-			, int offset, int limit)
+			, Object[] params, int offset, int limit)
 	{
 		StringBuilder sqlBuilder = new StringBuilder();
 		SelectMaker.getSql(sqlBuilder, table);
@@ -188,13 +188,18 @@ public class SqlExecutor {
 			log.fine(sql);
 		}
 		
-		Statement stmt = null;
+		PreparedStatement stmt = null;
 		ResultSet set = null;
 		List<T> list = new ArrayList<T>();
 		try {
-			stmt = db.createStatement();
+			stmt = db.prepareStatement(sql);
+			if (params != null) {
+				for (int i=0; i<params.length; ++i) {
+					stmt.setObject(i+1, params[i]);
+				}
+			}
 			//stmt.setMaxRows(offset+limit);
-			set = stmt.executeQuery(sql);
+			set = stmt.executeQuery();
 			//set.absolute(offset);
 			while (set.next())
 			{

@@ -59,7 +59,11 @@ public class ConnectionPool {
 		} catch (SQLException e) {
 			return;
 		}
-		list.offer(conn);
+		
+		boolean r = list.offer(conn);
+		if (!r) {
+			DbUtil.colseConnection(conn);
+		}
 	}
 	
 	public synchronized void clearAll() {

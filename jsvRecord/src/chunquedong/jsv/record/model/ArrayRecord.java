@@ -34,6 +34,13 @@ public class ArrayRecord implements Record {
 		if (i < 0) return null;
 		return get(i);
 	}
+
+	@Override
+  public void setId(Object id) {
+		int i = schema.getPk().getIndex();
+		if (i < 0) return;
+		set(i, id);
+  }
 	
 	@Override
 	public Object get(int i) {
@@ -71,4 +78,5 @@ public class ArrayRecord implements Record {
 	public String toString() {
 		return schema.getName() +":"+ Arrays.toString(values);
 	}
+
 }

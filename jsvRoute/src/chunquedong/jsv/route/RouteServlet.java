@@ -20,15 +20,30 @@ public class RouteServlet extends HttpServlet {
 	
 	private static final long serialVersionUID = -7749777676921475430L;
 	private String anctionPackage = "";
+	private static boolean isDebug = true;
 	
-	public String getAnctionPackage() {
-		return anctionPackage;
+	@Override
+  public void init() throws ServletException {
+		String debug = super.getInitParameter("debugMode");
+		isDebug = ("debug".equals(debug));
+		anctionPackage = super.getInitParameter(anctionPackage);
+		if (anctionPackage == null) {
+			anctionPackage = "";
+		}
+  }
+	
+	public static boolean isDebug() {
+		return isDebug;
 	}
-
+	
+	public static void setDebugMode(boolean debug) {
+		isDebug = debug;
+	}
+	
 	public void setAnctionPackage(String anctionPackage) {
 		this.anctionPackage = anctionPackage;
-	}
-
+  }
+	
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		String path = request.getRequestURI();

@@ -102,9 +102,10 @@ public class Context {
 	//Select where
 	//////////////////////////////////////////////////////////////////////////
 	
-	public List<Record> select(Schema table, String condition) {
-		return select(table, condition, 0, 50);
+	public List<Record> select(Schema table, String condition, Object[] params) {
+		return select(table, condition, params, 0, 50);
 	}
+	
 	/**
 	 *	query by condition
 	 * @param table
@@ -112,9 +113,11 @@ public class Context {
 	 * @param offset
 	 * @return
 	 */
-	public List<Record> select(Schema table, String condition, int offset, int limit)
+	public List<Record> select(Schema table, String condition, Object[] params
+			, int offset, int limit)
 	{
-		return this.executor.selectWhere(table, this.getConnection(), condition, offset, limit);
+		return this.executor.selectWhere(table, this.getConnection(), condition
+				, params, offset, limit);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////

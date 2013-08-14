@@ -71,7 +71,11 @@ public abstract class Controller	extends HttpServlet {
 		  invoke(method, param);
 		  
 		} catch (Throwable e) {
-			throw new RuntimeException(e);
+			if (RouteServlet.isDebug()) {
+				e.printStackTrace(response.getWriter());
+			} else {
+				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
 		} finally {
 			after();
 		}
@@ -114,6 +118,10 @@ public abstract class Controller	extends HttpServlet {
 		this.pathList = pathList;
 	}
 	
+	protected String getExtName() {
+		return extName;
+	}
+	
 	private boolean requesetMethodCheck(Method method, String name) {
 		if ((method.getModifiers() & Modifier.PUBLIC) == 0) {
 			return false;
@@ -149,18 +157,31 @@ public abstract class Controller	extends HttpServlet {
 		return null;
 	}
 	
-	public boolean before() {
+	protected boolean before() {
 		return true;
 	}
 	
-	public void after() {
+	protected void after() {
 	}
 	
-	public void render(String templateFile) {
+	protected void render(String templateFile) {
+		setContentType();
 		VelocityRender.getInstance().doRender(templateFile, request, response);
 	}
 	
-	public void render() {
+	protected void setContentType() {
+		if (extName.equals(".vm")) {
+			setContentType("text/html; charset=utf-8");
+		} else {
+			setContentType("text/"+extName+"; charset=utf-8");
+		}
+	}
+	
+	protected void setContentType(String type) {
+		response.setHeader("Content-Type", type);
+	}
+	
+	protected void render() {
 		render("./view/" + this.getClass().getSimpleName() + "/" + methodName + extName);
 	}
 }

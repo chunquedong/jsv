@@ -16,6 +16,8 @@ public interface Record extends Serializable {
 	
 	public Object getId();
 	
+	public void setId(Object id);
+	
 	public Object get(int i);
 	
 	public void set(int i, Object val);

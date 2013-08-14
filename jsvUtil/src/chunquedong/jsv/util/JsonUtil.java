@@ -8,8 +8,11 @@
 
 package chunquedong.jsv.util;
 
+import it.sauronsoftware.base64.Base64;
+
 import java.util.List;
 
+import chunquedong.jsv.record.model.DataType;
 import chunquedong.jsv.record.model.Field;
 import chunquedong.jsv.record.model.Record;
 import chunquedong.jsv.record.model.Schema;
@@ -24,13 +27,25 @@ public class JsonUtil {
 		return sb.toString();
 	}
 	
+	public static String toJson(Record r) {
+		StringBuilder sb = new StringBuilder();
+		toJson(r, sb);
+		return sb.toString();
+	}
+	
 	public static void toJson(Record r, StringBuilder sb) {
 		Schema table = r.getSchema();
 		for (int i=0; i<table.size(); ++i) {
 			Field f = table.get(i);
 			String name = f.getName();
-			String val = quote(r.get(i).toString());
-			sb.append(name).append(":").append(val);
+			sb.append(name).append(":");
+			
+			if (f.getType() == DataType.jbyteArray) {
+				sb.append(Base64.encode((byte[])r.get(i)));
+			} else {
+				String val = quote(r.get(i).toString());
+				sb.append(val);
+			}
 		}
 	}
 	

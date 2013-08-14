@@ -13,14 +13,14 @@ import java.util.regex.Pattern;
 
 public class Validate {
 	
-	static class ValidateException extends RuntimeException {
+	public static class ValidateException extends RuntimeException {
     private static final long serialVersionUID = 2075908417197198740L;
 		public ValidateException(String msg) {
 			super(msg);
 		}
 	}
 	
-	static boolean matches(String regex, String text, boolean caseSensitive) {
+	public static boolean matches(String regex, String text, boolean caseSensitive) {
 		Pattern pattern;
 		if (!caseSensitive) {
 			pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
@@ -31,12 +31,12 @@ public class Validate {
 		return (matcher.matches());
 	}
 	
-  static boolean isEmail(String text)
+	public static boolean isEmail(String text)
   {
     return matches("^(?:\\w+\\.?)*\\w+@(?:\\w+\\.?)*\\w+$", text, true);
   }
 
-  static boolean isDigit(String text)
+	public static boolean isDigit(String text)
   {
     for (int i = 0; i < text.length(); i++)
     {
@@ -45,17 +45,17 @@ public class Validate {
     return true;
   }
 
-  static boolean isUri(String text)
+	public static boolean isUri(String text)
   {
     return matches("(\\w+):\\/\\/([^\\/:]+)(:\\d*)?([^#]*)", text, true);
   }
 
-  static boolean isDate(String text)
+	public static boolean isDate(String text)
   {
     return matches("^(\\d{4})\\-(\\d{2})\\-(\\d{2})$", text, true);
   }
 
-  static boolean isIdentifier(String text)
+	public static boolean isIdentifier(String text)
   {
     return matches("^[a-zA-Z][a-zA-Z0-9_]{3,35}$", text, true);
   }
@@ -64,7 +64,7 @@ public class Validate {
   // check
   ////////////////////////////////////////////////////////////////////////
 
-  Validate email(String text, String msg)
+	public Validate email(String text, String msg)
   {
     if (text.isEmpty()) return this;
     if (!isEmail(text))
@@ -72,7 +72,7 @@ public class Validate {
     return this;
   }
 
-  Validate digit(String text, String msg)
+	public Validate digit(String text, String msg)
   {
     if (text.isEmpty()) return this;
     if (!isDigit(text))
@@ -80,7 +80,7 @@ public class Validate {
     return this;
   }
 
-  Validate date(String text, String msg)
+	public Validate date(String text, String msg)
   {
     if (text.isEmpty()) return this;
     if (!isDate(text))
@@ -88,7 +88,7 @@ public class Validate {
     return this;
   }
 
-  Validate uri(String text, String msg)
+	public Validate uri(String text, String msg)
   {
     if (text.isEmpty()) return this;
     if (!isUri(text))
@@ -96,7 +96,7 @@ public class Validate {
     return this;
   }
 
-  Validate identifier(String text, String msg)
+	public Validate identifier(String text, String msg)
   {
     if (text.isEmpty()) return this;
     if (!isIdentifier(text))
@@ -104,21 +104,25 @@ public class Validate {
     return this;
   }
 
-  Validate range(int i, int min, int max, String msg)
+	public Validate range(int i, int min, int max, String msg)
   {
     if (i > max || i < min)
     	throw new ValidateException(msg != null ? msg : i+" out of ["+min+","+max+"]");
     return this;
   }
 
-  Validate length(String text, int min, int max, String msg)
+	public Validate length(String text, int min, int max, String msg)
   {
     if (text.length() > max || text.length() < min)
     	throw new ValidateException(msg != null ? msg : "the "+text+" length out of ["+min+","+max+"]");
     return this;
   }
 
-  Validate required(String text, String msg)
+	public Validate required(String text) {
+		return required(text, null);
+	}
+	
+	public Validate required(String text, String msg)
   {
     if (text == null || text.isEmpty())
     	throw new ValidateException(msg != null ? msg : "the text is required");
