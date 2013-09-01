@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import chunquedong.jsv.route.Controller;
 
 public class VelocityTest extends Controller {
-	private static final long serialVersionUID = 1L;
 	
 	public void index() {
 		ArrayList<String> list = new ArrayList<String>();

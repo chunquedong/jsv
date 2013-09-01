@@ -35,7 +35,7 @@ public class ConnectionPool {
 		while (list.size() > 0) {
 			Connection conn = list.poll();
 			try {
-				if (!conn.isClosed() && conn.isValid(10)) {
+				if (!conn.isClosed()) {
 					return conn;
 				}
 			} catch (SQLException e) {

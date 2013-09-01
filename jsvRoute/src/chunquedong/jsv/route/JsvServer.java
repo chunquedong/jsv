@@ -23,7 +23,7 @@ import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
  
-public class Service extends AbstractHandler {
+public class JsvServer extends AbstractHandler {
 	
 	private HttpServlet rootServlet;
 	
@@ -42,9 +42,9 @@ public class Service extends AbstractHandler {
 			baseRequest.setHandled(true);
 		}
 	}
- 
-	public static void main(String[] args) throws Exception {
-		Server server = new Server(8080);
+	
+	public static void start(String packageName, int port) throws Exception {
+		Server server = new Server(port);
 		
 		ResourceHandler resourceandler = new ResourceHandler();
 		resourceandler.setDirectoriesListed(true);
@@ -53,9 +53,9 @@ public class Service extends AbstractHandler {
 		
 		//ServletHandler servletHandler = new ServletHandler();
 		//servletHandler.addServletWithMapping(HelloServlet.class, "/*");
-		Service servletHandler = new Service();
+		JsvServer servletHandler = new JsvServer();
 		RouteServlet routeServlet = new RouteServlet();
-		routeServlet.setAnctionPackage("chunquedong.jsv.action.");
+		routeServlet.setAnctionPackage(packageName);
 		servletHandler.setRootServlet(routeServlet);
 		
 		HandlerList handlers = new HandlerList();
@@ -64,5 +64,9 @@ public class Service extends AbstractHandler {
 		server.setHandler(handlers);
 		server.start();
 		server.join();
+	}
+ 
+	public static void main(String[] args) throws Exception {
+		start("chunquedong.jsv.action.", 8080);
 	}
 }

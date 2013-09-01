@@ -7,7 +7,6 @@ import chunquedong.jsv.route.Controller;
 
 
 public class Test extends Controller {
-	private static final long serialVersionUID = 1L;
 
 	public void get(long id) throws IOException {
 		response.getWriter().println("get:"+id);

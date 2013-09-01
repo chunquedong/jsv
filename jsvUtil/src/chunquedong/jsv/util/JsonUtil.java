@@ -21,9 +21,13 @@ public class JsonUtil {
 	
 	public static String toJson(List<Record> list) {
 		StringBuilder sb = new StringBuilder();
+		sb.append("[\n");
 		for (Record r : list) {
+			sb.append("  ");
 			toJson(r, sb);
+			sb.append(",\n");
 		}
+		sb.append("]");
 		return sb.toString();
 	}
 	
@@ -34,6 +38,7 @@ public class JsonUtil {
 	}
 	
 	public static void toJson(Record r, StringBuilder sb) {
+		sb.append("{");
 		Schema table = r.getSchema();
 		for (int i=0; i<table.size(); ++i) {
 			Field f = table.get(i);
@@ -47,6 +52,7 @@ public class JsonUtil {
 				sb.append(val);
 			}
 		}
+		sb.append("}");
 	}
 	
 	public static String quote(String string) {

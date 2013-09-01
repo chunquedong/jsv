@@ -9,6 +9,7 @@
 package chunquedong.jsv.route;
 import java.io.IOException;
 
+import javax.servlet.Servlet;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -56,7 +57,7 @@ public class RouteServlet extends HttpServlet {
 			className = pathList[0];
 		}
 		
-		HttpServlet servlet = getServletInstance(anctionPackage + className);
+		Object servlet = getServletInstance(anctionPackage + className);
 		if (servlet == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
@@ -65,9 +66,14 @@ public class RouteServlet extends HttpServlet {
 		if ((servlet instanceof Controller)) {
 			Controller controller = (Controller)servlet;
 			controller.setPathList(pathList);
+			controller.service(request, response);
+		} else if (servlet instanceof Servlet) {
+			Servlet s = (Servlet)servlet;
+			s.service(request, response);
+		} else {
+			response.sendError(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+			return;
 		}
-		
-		servlet.service(request, response);
 	}
 
 	private int splitPath(String path, String[] list) {
@@ -109,11 +115,11 @@ public class RouteServlet extends HttpServlet {
 		return count;
 	}
 	
-	private HttpServlet getServletInstance(String className)	{
+	private Object getServletInstance(String className)	{
 		Class<?> type;
 		try {
 			type = Class.forName(className);
-			return (HttpServlet) type.newInstance();
+			return type.newInstance();
 		} catch (ClassNotFoundException e) {
 			return null;
 		} catch (InstantiationException e) {

@@ -20,7 +20,7 @@ public class TableMaker {
 			if (i != 0) {
 				sql.append(",");
 			}
-			sql.append(f.getName());
+			sql.append(SqlUtil.escaptSqlWord(f.getName()));
 			sql.append(" ");
 			sql.append(f.getSqlType());
 		}

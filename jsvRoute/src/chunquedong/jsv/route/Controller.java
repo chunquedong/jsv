@@ -14,20 +14,17 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
-public abstract class Controller	extends HttpServlet {
-	private static final long serialVersionUID = 1784867224406169093L;
+public abstract class Controller {
 	protected HttpServletRequest request;
 	protected HttpServletResponse response;
 	private String[] pathList;
 	private String methodName;
 	private String extName;
 	
-	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		if (!before()) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -71,11 +68,7 @@ public abstract class Controller	extends HttpServlet {
 		  invoke(method, param);
 		  
 		} catch (Throwable e) {
-			if (RouteServlet.isDebug()) {
-				e.printStackTrace(response.getWriter());
-			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-			}
+			onError(e);
 		} finally {
 			after();
 		}
@@ -103,11 +96,13 @@ public abstract class Controller	extends HttpServlet {
 				return;
 			}
 		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
+			onError(e);
 		} catch (IllegalAccessException e) {
-			e.printStackTrace();
+			onError(e);
 		} catch (InvocationTargetException e) {
-			e.printStackTrace();
+			onError(e.getCause());
+		} catch (Throwable e) {
+			onError(e);
 		}
 	}
 	
@@ -162,6 +157,18 @@ public abstract class Controller	extends HttpServlet {
 	}
 	
 	protected void after() {
+	}
+	
+	protected void onError(Throwable e) {
+		try {
+			if (RouteServlet.isDebug()) {
+				e.printStackTrace(response.getWriter());
+			} else {
+		      response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			}
+		} catch (IOException e1) {
+      e1.printStackTrace();
+    }
 	}
 	
 	protected void render(String templateFile) {

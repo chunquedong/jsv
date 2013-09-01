@@ -67,6 +67,10 @@ public class SqlUtil {
 		}
 	}
 	
+	public static String escaptSqlWord(String w) {
+		return "`" + w +"`";
+	}
+	
 	public static boolean checkMatchDb(Schema s, ResultSet tcols) {
 		return true;
 	}
