@@ -40,7 +40,7 @@ public class TableMaker {
 		sql.append("create index index_");
 		sql.append(tableName).append("_").append(fieldName);
 		sql.append(" on ").append(tableName);
-		sql.append("(").append(fieldName).append("");
+		sql.append("(").append(fieldName).append(")");
 		return sql.toString();
 	}
 

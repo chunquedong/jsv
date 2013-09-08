@@ -292,11 +292,11 @@ public class SqlExecutor {
 	////////////////////////////////////////////////////////////////////////
 	
 	private PreparedStatement byIdStmt(Schema table, Connection db
-			, Object id, StringBuilder before)
+			, Object id, StringBuilder before) throws SQLException
 	{
 		IdWhereMaker.getSql(before, table);
 		String sql = before.toString();
-		Object[] params = IdWhereMaker.getParam(table, id);
+		Object[] params = IdWhereMaker.getParam(id);
 		if (log.isLoggable(Level.FINE))
 		{
 			log.fine(sql);
@@ -304,24 +304,19 @@ public class SqlExecutor {
 		}
 		
 		PreparedStatement stmt = null;
-		try {
-			stmt = db.prepareStatement(sql);
-			for (int i=0; i<params.length; ++i) {
-				stmt.setObject(i+1, params[i]);
-			}
-			return stmt;
-		} catch (SQLException e) {
-			throw new RuntimeException(e);
-		} finally {
-			DbUtil.colseStatement(stmt);
+		stmt = db.prepareStatement(sql);
+		for (int i=0; i<params.length; ++i) {
+			stmt.setObject(i+1, params[i]);
 		}
+		return stmt;
 	}
 	
 	public boolean removeById(Schema table, Connection db, Object id)
 	{
 		StringBuilder sqlBuilder = new StringBuilder("delete ");
-		PreparedStatement stmt = byIdStmt(table, db, id, sqlBuilder);
+		PreparedStatement stmt = null;
 		try {
+			stmt = byIdStmt(table, db, id, sqlBuilder);
 			return stmt.execute();
 		} catch (SQLException e) {
 			throw new RuntimeException(e);
@@ -332,13 +327,13 @@ public class SqlExecutor {
 	
 	public boolean loadById(Schema table, Connection db, Object id, Object obj)
 	{
-		StringBuilder sqlBuilder = new StringBuilder("select ");
+		StringBuilder sqlBuilder = new StringBuilder();
 		SelectMaker.getSql(sqlBuilder, table);
-		PreparedStatement stmt = byIdStmt(table, db, id, sqlBuilder);
-
+		PreparedStatement stmt = null;
 		ResultSet set = null;
 		try {
-			stmt.setMaxRows(1);
+			stmt = byIdStmt(table, db, id, sqlBuilder);
+			//stmt.setMaxRows(1);
 			set = stmt.executeQuery();
 			if (set.next())
 			{
@@ -357,10 +352,11 @@ public class SqlExecutor {
 	public boolean existById(Schema table, Connection db, Object id)
 	{
 		StringBuilder sqlBuilder = new StringBuilder("select *");
-		PreparedStatement stmt = byIdStmt(table, db, id, sqlBuilder);
+		PreparedStatement stmt = null;
 		ResultSet set = null;
 		try {
-			stmt.setMaxRows(1);
+			stmt = byIdStmt(table, db, id, sqlBuilder);
+			//stmt.setMaxRows(1);
 			set = stmt.executeQuery();
 			if (set.next())
 			{

@@ -7,7 +7,7 @@ import chunquedong.jsv.record.model.*;
 public class Teacher extends ArrayRecord {
   private static final long serialVersionUID = 8025910303754944217L;
   
-	static Schema createSchema()
+  public static Schema createSchema()
 	{
 		Schema schema = new Schema("Teacher", Teacher.class);
 		schema.add(new Field("sid", DataType.identity));
@@ -22,13 +22,13 @@ public class Teacher extends ArrayRecord {
 		return schema;
 	}
 	
-	Integer getSid() { return (Integer)super.get(0); }
-	void setSid(int val) { super.set(0, val); }
+	Long getSid() { return (Long)super.get(0); }
+	void setSid(long val) { super.set(0, val); }
 	
-	String getName() { return (String)super.get(1); }
+	public String getName() { return (String)super.get(1); }
 	void setName(String val) { super.set(1, val); }
 	
-	int getAge() { return (Integer)super.get(2); }
+	public int getAge() { return (Integer)super.get(2); }
 	void setAge(int val) { super.set(2, val); }
 	
 	float getWeight() { return (Float)super.get(3); }

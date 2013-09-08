@@ -18,10 +18,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.SessionManager;
 import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.server.session.HashSessionManager;
+import org.eclipse.jetty.server.session.SessionHandler;
  
 public class JsvServer extends AbstractHandler {
 	
@@ -58,8 +61,9 @@ public class JsvServer extends AbstractHandler {
 		routeServlet.setAnctionPackage(packageName);
 		servletHandler.setRootServlet(routeServlet);
 		
+		SessionManager sm = new HashSessionManager();
 		HandlerList handlers = new HandlerList();
-		handlers.setHandlers(new Handler[] { servletHandler, resourceandler, new DefaultHandler() });
+		handlers.setHandlers(new Handler[] { new SessionHandler(sm), servletHandler, resourceandler, new DefaultHandler() });
 		
 		server.setHandler(handlers);
 		server.start();

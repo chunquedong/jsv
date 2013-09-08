@@ -40,13 +40,17 @@ public class JsonUtil {
 	public static void toJson(Record r, StringBuilder sb) {
 		sb.append("{");
 		Schema table = r.getSchema();
+		sb.append("\"__typeName__\":\"").append(table.getName()).append("\"");
 		for (int i=0; i<table.size(); ++i) {
+			if (r.get(i) == null) {
+				continue;
+			}
 			Field f = table.get(i);
 			String name = f.getName();
-			sb.append(name).append(":");
+			sb.append(",\"").append(name).append("\":");
 			
 			if (f.getType() == DataType.jbyteArray) {
-				sb.append(Base64.encode((byte[])r.get(i)));
+				sb.append("\"").append(Base64.encode((byte[])r.get(i))).append("\"");
 			} else {
 				String val = quote(r.get(i).toString());
 				sb.append(val);

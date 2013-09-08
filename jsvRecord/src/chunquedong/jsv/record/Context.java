@@ -171,7 +171,7 @@ public class Context {
 		}
 	}
 	
-	private boolean existById(Record obj)
+	public boolean existById(Record obj)
 	{
 		Object id = obj.getId();
 		if (this.executor.existById(obj.getSchema(), this.getConnection(), id))

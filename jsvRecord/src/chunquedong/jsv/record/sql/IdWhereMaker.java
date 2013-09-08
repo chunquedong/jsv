@@ -17,10 +17,10 @@ public class IdWhereMaker {
 		sql.append("=?");
 	}
 	
-	public static Object[] getParam(Schema table, Object obj)
+	public static Object[] getParam(Object id)
 	{
 		Object[] param = new Object[1];
-		param[0] = table.getPk().getValue(obj);
+		param[0] = id;
 		return param;
 	}
 }

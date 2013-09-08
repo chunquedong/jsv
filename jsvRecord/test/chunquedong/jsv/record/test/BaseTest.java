@@ -33,8 +33,8 @@ public class BaseTest {
 	{
 		log.setLevel(Level.ALL);
 		table = Teacher.createSchema();
-		String driver = "org.sqlite.JDBC";
-		String url = "jdbc:sqlite:test.db";
+		String driver = "org.h2.Driver";
+		String url = "jdbc:h2:./test";
 		String userName = "postgres";
 		String passWord = "111";
 		connectionPool = new ConnectionPool(driver, url, userName, passWord, 20);
@@ -84,6 +84,12 @@ public class BaseTest {
 		Assert.assertTrue(Math.abs(t2.getWeight()-56.9f) < 1E-5);
 		Assert.assertEquals(t2.getImage()[0], 'k');
 		System.out.println(t2.getTime());
+		
+		Teacher t3 = new Teacher();
+		t3.init(table);
+		t3.setSid(t2.getSid());
+		c.loadById(table, t3);
+		Assert.assertEquals(t3.getAge(), 26);
 	}
 	
 	@Test
