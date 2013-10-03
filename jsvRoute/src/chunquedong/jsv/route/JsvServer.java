@@ -46,7 +46,7 @@ public class JsvServer extends AbstractHandler {
 		}
 	}
 	
-	public static void start(String packageName, int port) throws Exception {
+	public static void start(String packageName, int port, String classPath) throws Exception {
 		Server server = new Server(port);
 		
 		ResourceHandler resourceandler = new ResourceHandler();
@@ -58,7 +58,8 @@ public class JsvServer extends AbstractHandler {
 		//servletHandler.addServletWithMapping(HelloServlet.class, "/*");
 		JsvServer servletHandler = new JsvServer();
 		RouteServlet routeServlet = new RouteServlet();
-		routeServlet.setAnctionPackage(packageName);
+		routeServlet.setActionPackage(packageName);
+		routeServlet.setClassPath(classPath);
 		servletHandler.setRootServlet(routeServlet);
 		
 		SessionManager sm = new HashSessionManager();
@@ -71,6 +72,6 @@ public class JsvServer extends AbstractHandler {
 	}
  
 	public static void main(String[] args) throws Exception {
-		start("chunquedong.jsv.action.", 8080);
+		start("chunquedong.jsv.action.", 8080, "./bin");
 	}
 }

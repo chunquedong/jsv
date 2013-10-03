@@ -20,16 +20,17 @@ import javax.servlet.http.HttpServletResponse;
 public class RouteServlet extends HttpServlet {
 	
 	private static final long serialVersionUID = -7749777676921475430L;
-	private String anctionPackage = "";
+	private String actionPackage = "";
 	private static boolean isDebug = true;
+	private static HotReloader reloader = null;
 	
 	@Override
   public void init() throws ServletException {
 		String debug = super.getInitParameter("debugMode");
 		isDebug = ("debug".equals(debug));
-		anctionPackage = super.getInitParameter(anctionPackage);
-		if (anctionPackage == null) {
-			anctionPackage = "";
+		actionPackage = super.getInitParameter(actionPackage);
+		if (actionPackage == null) {
+			actionPackage = "";
 		}
   }
 	
@@ -41,9 +42,13 @@ public class RouteServlet extends HttpServlet {
 		isDebug = debug;
 	}
 	
-	public void setAnctionPackage(String anctionPackage) {
-		this.anctionPackage = anctionPackage;
+	public void setActionPackage(String anctionPackage) {
+		this.actionPackage = anctionPackage;
   }
+	
+	public void setClassPath(String classPath) {
+		reloader = new HotReloader(classPath);
+	}
 	
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -57,7 +62,7 @@ public class RouteServlet extends HttpServlet {
 			className = pathList[0];
 		}
 		
-		Object servlet = getServletInstance(anctionPackage + className);
+		Object servlet = getServletInstance(actionPackage + className);
 		if (servlet == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
@@ -118,7 +123,11 @@ public class RouteServlet extends HttpServlet {
 	private Object getServletInstance(String className)	{
 		Class<?> type;
 		try {
-			type = Class.forName(className);
+			if (isDebug()) {
+				type = reloader.findClass(className);
+			} else {
+				type = Class.forName(className);
+			}
 			return type.newInstance();
 		} catch (ClassNotFoundException e) {
 			return null;

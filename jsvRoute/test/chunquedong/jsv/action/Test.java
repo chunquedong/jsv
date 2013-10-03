@@ -13,7 +13,7 @@ public class Test extends Controller {
 	}
 	
 	public void index() throws IOException {
-		response.getWriter().println("index");
+		response.getWriter().println("index2");
 	}
 	
 	@Action.Post
