@@ -50,7 +50,7 @@ public class Context {
 	 */
 	public void update(Record obj)
 	{
-		this.executor.update(obj.getSchema(), this.getConnection(), obj);
+		this.executor.updateById(obj.getSchema(), this.getConnection(), obj);
 	}
 	
 	/**

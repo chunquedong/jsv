@@ -92,11 +92,25 @@ public class BaseTest {
 		Assert.assertEquals(t3.getAge(), 26);
 	}
 	
+	private void update() {
+		Teacher t1 = new Teacher();
+		t1.init(table);
+		t1.setName("yjd");
+		Teacher t2 = (Teacher)c.one(t1);
+		
+		t2.setAge(25);
+		c.update(t2);
+		
+		Teacher t3 = (Teacher)c.one(t1);
+		Assert.assertEquals(t3.getAge(), 25);
+	}
+	
 	@Test
 	public void test() {
 		buildTable();
 		insert();
 		query();
+		update();
 	}
 
 }

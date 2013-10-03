@@ -1,3 +1,11 @@
+//
+// Copyright (c) 2013, chunquedong
+// Licensed under the MIT License
+//
+// History:
+//	 2013-10-3	Jed Young	Creation
+//
+
 package chunquedong.jsv.route;
 
 import java.io.File;

@@ -55,9 +55,11 @@ public class SqlExecutor {
 		}
 	}
 	
-	public void update(Schema table, Connection db, Object obj)
+	public void updateById(Schema table, Connection db, Object obj)
 	{
-		String sql = UpdateMaker.getSql(table);
+		StringBuilder sqlBuilder = new StringBuilder();
+		UpdateMaker.getSql(sqlBuilder, table);
+		String sql = sqlBuilder.toString();
 		Object[] params = UpdateMaker.getParam(table, obj);
 		if (log.isLoggable(Level.FINE))
 		{

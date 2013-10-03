@@ -12,8 +12,7 @@ import chunquedong.jsv.record.model.Field;
 import chunquedong.jsv.record.model.Schema;
 
 public class UpdateMaker {
-	public static String getSql(Schema table) {
-		StringBuilder sql = new StringBuilder();
+	public static void getSql(StringBuilder sql, Schema table) {
 		sql.append("update ").append(table.getName()).append(" set ");
 
 		for (int i=0,n=table.size(); i<n; ++i) {
@@ -27,7 +26,6 @@ public class UpdateMaker {
 		sql.deleteCharAt(sql.length() - 1);
 		sql.append(" where ").append(table.getPk().getName()).append("=?");
 
-		return sql.toString();
 	}
 	
 	public static Object[] getParam(Schema table, Object obj)
