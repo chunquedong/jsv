@@ -50,7 +50,8 @@ public class JsonUtil {
 			sb.append(",\"").append(name).append("\":");
 			
 			if (f.getType() == DataType.jbyteArray) {
-				sb.append("\"").append(Base64.encode((byte[])r.get(i))).append("\"");
+				String code = new String(Base64.encode((byte[])r.get(i)));
+				sb.append("\"").append(code).append("\"");
 			} else {
 				String val = quote(r.get(i).toString());
 				sb.append(val);

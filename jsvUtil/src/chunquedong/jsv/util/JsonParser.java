@@ -1,5 +1,11 @@
 package chunquedong.jsv.util;
 
+import it.sauronsoftware.base64.Base64;
+
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +15,6 @@ import chunquedong.jsv.record.model.DataType;
 import chunquedong.jsv.record.model.Field;
 import chunquedong.jsv.record.model.Record;
 import chunquedong.jsv.record.model.Schema;
-
 import commons.json.Json;
 
 public class JsonParser {
@@ -46,6 +51,41 @@ public class JsonParser {
 		return list;
 	}
 	
+	public static Object parse(int type, String s) {
+		switch (type) {
+		case DataType.jinteger:
+			return Integer.parseInt(s);
+		case DataType.jbyte:
+			return Byte.parseByte(s);
+		case DataType.jshort:
+			return Short.parseShort(s);
+		case DataType.jlong:
+			return Long.parseLong(s);
+		case DataType.jboolean:
+			return Boolean.parseBoolean(s);
+		case DataType.jstring:
+			return s;
+		case DataType.jbyteArray:
+			return Base64.decode(s.getBytes());
+		case DataType.jdate:
+			return Date.valueOf(s);
+		case DataType.jtime:
+			return Time.valueOf(s);
+		case DataType.jtimestamp:
+			return Timestamp.valueOf(s);
+		case DataType.jdecimal:
+			return BigDecimal.valueOf(Double.parseDouble(s));
+		case DataType.jdouble:
+			return Double.parseDouble(s);
+		case DataType.jfloat:
+			return Float.parseFloat(s);
+		case DataType.jother:
+			throw new RuntimeException("TODO");
+		default:
+			throw new RuntimeException("TODO");
+		}
+	}
+	
 	private Record parseObj(Map<String, Object> obj, Schema table) {
 		if (table == null) {
 			String typeName = obj.get("__typeName__").toString();
@@ -60,7 +100,7 @@ public class JsonParser {
 				continue;
 			}
 			String val = obj.get(name).toString();
-			Object v = DataType.parse(f.getType(), val);
+			Object v = parse(f.getType(), val);
 			record.set(f.getName(), v);
 		}
 		return record;

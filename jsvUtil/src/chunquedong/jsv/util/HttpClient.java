@@ -7,8 +7,14 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.CookieHandler;
 import java.net.CookieManager;
+import java.net.HttpCookie;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -23,6 +29,34 @@ public class HttpClient {
 	public static void initCookie() {
 		CookieManager cookieManager = new CookieManager();
 		CookieHandler.setDefault(cookieManager);
+	}
+	
+	public static String getCookie(String uri, String name) {
+		CookieManager cookieManager = (CookieManager)CookieHandler.getDefault();
+		try {
+	    List<HttpCookie> list = cookieManager.getCookieStore().get(new URI(uri));
+	    for (HttpCookie c : list) {
+	    	if (c.getName().equals(name)) {
+	    		return c.getValue();
+	    	}
+	    }
+    } catch (URISyntaxException e) {
+	    e.printStackTrace();
+    }
+		return null;
+	}
+	
+	public static void addCookie(String uri, String name, String value) {
+		CookieManager cookieManager = (CookieManager)CookieHandler.getDefault();
+		try {
+			URI u = new URI(uri);
+			HttpCookie c = new HttpCookie(name, value);
+			c.setPath("/");
+			c.setDomain(u.getHost());
+	    cookieManager.getCookieStore().add(new URI(uri), c);
+    } catch (URISyntaxException e) {
+	    e.printStackTrace();
+    }
 	}
 	
 	public static String streamToString(InputStream is) throws IOException {
@@ -88,6 +122,7 @@ public class HttpClient {
 	        	callback.call(false, null);
 	        }
         } catch (Throwable e) {
+        	e.printStackTrace();
         	callback.call(false, e);
         }
       }});
@@ -105,6 +140,7 @@ public class HttpClient {
 	        	callback.call(false, null);
 	        }
         } catch (Throwable e) {
+        	e.printStackTrace();
         	callback.call(false, e);
         }
       }});

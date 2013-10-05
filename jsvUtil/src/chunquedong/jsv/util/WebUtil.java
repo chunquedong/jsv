@@ -23,7 +23,7 @@ public class WebUtil {
 			String str = request.getParameter(table.getName() + "," + f.getName());
 			if (str == null) continue;
 			try {
-			  Object val = DataType.parse(f.getType(), str);
+			  Object val = JsonParser.parse(f.getType(), str);
 			  record.set(i, val);
 			} catch (Exception ex) {
 				//continue;
