@@ -58,6 +58,7 @@ public class JsvServer extends AbstractHandler {
 		//servletHandler.addServletWithMapping(HelloServlet.class, "/*");
 		JsvServer servletHandler = new JsvServer();
 		RouteServlet routeServlet = new RouteServlet();
+		
 		routeServlet.setActionPackage(packageName);
 		routeServlet.setClassPath(classPath);
 		servletHandler.setRootServlet(routeServlet);

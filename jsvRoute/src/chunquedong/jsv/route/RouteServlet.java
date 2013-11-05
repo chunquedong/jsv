@@ -43,6 +43,9 @@ public class RouteServlet extends HttpServlet {
 	}
 	
 	public void setActionPackage(String anctionPackage) {
+		if (!anctionPackage.endsWith(".")) {
+			anctionPackage += ".";
+		}
 		this.actionPackage = anctionPackage;
   }
 	

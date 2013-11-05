@@ -31,13 +31,13 @@ public class VelocityRender {
 	
 	public void doRender(String templateFile, ServletRequest request, ServletResponse response) {
 		try {
-			doRender(templateFile, request, response.getWriter());
+			doRender(templateFile, request, response.getWriter(), response.getCharacterEncoding());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
 	
-	public void doRender(String templateFile, ServletRequest request, Writer writer)
+	public void doRender(String templateFile, ServletRequest request, Writer writer, String encoding)
 	{
 		VelocityContext context = new VelocityContext();
 		for (Enumeration<String> attrs=request.getAttributeNames(); attrs.hasMoreElements();) {
@@ -47,7 +47,7 @@ public class VelocityRender {
 				
 		try
 		{
-			Template template = Velocity.getTemplate(templateFile);
+			Template template = Velocity.getTemplate(templateFile, encoding);
 			template.merge(context, writer);
 		}
 		catch( ResourceNotFoundException rnfe )
