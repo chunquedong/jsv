@@ -46,7 +46,8 @@ public class JsvServer extends AbstractHandler {
 		}
 	}
 	
-	public static void start(String packageName, int port, String classPath) throws Exception {
+	public static void start(String packageName, int port, String classPath
+			, boolean isDebug) throws Exception {
 		Server server = new Server(port);
 		
 		ResourceHandler resourceandler = new ResourceHandler();
@@ -61,6 +62,7 @@ public class JsvServer extends AbstractHandler {
 		
 		routeServlet.setActionPackage(packageName);
 		routeServlet.setClassPath(classPath);
+		RouteServlet.setDebugMode(isDebug);
 		servletHandler.setRootServlet(routeServlet);
 		
 		SessionManager sm = new HashSessionManager();
@@ -73,6 +75,19 @@ public class JsvServer extends AbstractHandler {
 	}
  
 	public static void main(String[] args) throws Exception {
-		start("chunquedong.jsv.action.", 8080, "./bin");
+		String packageName = "chunquedong.jsv.action.";
+		int port = 8080;
+		String classPath = "./bin";
+		boolean isDebug = true;
+		if (args.length == 3) {
+			packageName = args[0];
+			port = Integer.parseInt(args[1]);
+			classPath = args[3];
+			isDebug = Boolean.parseBoolean(args[4]);
+		} else if (args.length == 1) {
+			System.out.println("1.packageName; 2.port; 3.classPath; 4.isDebug");
+			return;
+		}
+		start(packageName, port, classPath, isDebug);
 	}
 }

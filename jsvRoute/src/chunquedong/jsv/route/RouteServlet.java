@@ -126,7 +126,7 @@ public class RouteServlet extends HttpServlet {
 	private Object getServletInstance(String className)	{
 		Class<?> type;
 		try {
-			if (isDebug()) {
+			if (reloader != null) {
 				type = reloader.findClass(className);
 			} else {
 				type = Class.forName(className);
