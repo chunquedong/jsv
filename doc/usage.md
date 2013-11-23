@@ -28,7 +28,7 @@ URL路由
   http://localhost:8080/Test/index
 将会调Test类的index方法(默认就是index所以index可省略)。
 Test类推荐继承Controller，也可以是Servlet(这种情况下就不提供方法路由的功能)，其他情况下会报错。
-为了安全起见，这写方法必须是public才能调用。
+为了安全起见，这写方法必须是public才能调用。Post方法必须加@Action.Post才能访问。
 
 如果方法后面有死路径则会将其作为参数传入，例如：
   http://localhost:8080/Test/index/123
@@ -38,10 +38,11 @@ Test类推荐继承Controller，也可以是Servlet(这种情况下就不提供�
 =====================
 如果在index方法中调用render()方法，将会渲染view/Test/index.vm模版视图。当然也可以显市制定模版路径。
 如果URL后面有后缀名，例如：http://localhost:8080/Test/index.xml。将会渲染view/Test/index.xml模版文件，而不是index.vm
+通过request.setAttribute将参数传给模版。具体模版的语法见Velocity的文档。
 
 运行
 =====================
-可以用命令行执行JsvServer.main函数。
+可以用命令行执行JsvServer.main函数来启动服务器。
 或者在自己的工程中的某个地方的main函数中调用JsvServer的start方法。
 
 参数有： action包名，端口号，热加载类路径，是否调试模式。
