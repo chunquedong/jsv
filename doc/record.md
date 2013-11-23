@@ -11,9 +11,9 @@ Record模式类似与一个ORM的工具。
 
 建立链接
 -------------
-  ConnectionPool connectionPool = new ConnectionPool(driver, url, userName, passWord, 20);
-  Context.setConnection(connectionPool.open());
-  Context c = new Context();
+    ConnectionPool connectionPool = new ConnectionPool(driver, url, userName, passWord, 20);
+    Context.setConnection(connectionPool.open());
+    Context c = new Context();
 建立链接后Context负责所有数据库操作。
 
 增删查改

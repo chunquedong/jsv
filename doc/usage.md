@@ -2,19 +2,19 @@
 用法
 ====================
 新建一个项目基本结构如下：
---
-  |--bin
-  |--src_
-  |      |--action_
-  |                |--Test
-  |      |--model
-  |
-  |--view_
-  |       |--Test_
-  |               |index.vm
-  |
-  |--public
-  |--libs
+    --
+      |--bin
+      |--src_
+      |      |--action_
+      |                |--Test
+      |      |--model
+      |
+      |--view_
+      |       |--Test_
+      |               |index.vm
+      |
+      |--public
+      |--libs
 
 bin是用来存储编译后的.class文件，这个目录名称可以配置为将来的热加载类路径。
 src用来存储源码文件，为了安全期间所有Action单独放一个包。
