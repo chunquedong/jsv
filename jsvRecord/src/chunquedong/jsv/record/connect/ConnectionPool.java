@@ -40,7 +40,7 @@ public class ConnectionPool {
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
-				DbUtil.colseConnection(conn);
+				DbUtil.closeConnection(conn);
 			}
 		}
 		return DbUtil.getConnection(driver, url, userName, passWord);
@@ -61,13 +61,13 @@ public class ConnectionPool {
 		
 		boolean r = list.offer(conn);
 		if (!r) {
-			DbUtil.colseConnection(conn);
+			DbUtil.closeConnection(conn);
 		}
 	}
 	
-	public synchronized void clearAll() {
+	public synchronized void closeAll() {
 		for (Connection conn : list) {
-			DbUtil.colseConnection(conn);
+			DbUtil.closeConnection(conn);
 		}
 		list.clear();
 	}

@@ -256,7 +256,7 @@ public class Context {
 			} catch (SQLException e) {
 				throw new RuntimeException(e);
 			}
-			DbUtil.colseConnection(conn);
+			DbUtil.closeConnection(conn);
 		}
 	}
 }

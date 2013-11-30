@@ -75,7 +75,7 @@ public class DbUtil {
 		}
 	}
 
-	public static void colseConnection(Connection con) {
+	public static void closeConnection(Connection con) {
 		if (con != null) {
 			try {
 				con.close();
