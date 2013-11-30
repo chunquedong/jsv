@@ -19,8 +19,8 @@ public class BaseTest {
 	public void setup()
 	{
 		table = Teacher.createSchema();
-		String driver = "org.h2.Driver";
-		String url = "jdbc:h2:./test";
+		String driver = "org.sqlite.JDBC";
+		String url = "jdbc:sqlite:test.db";
 		String userName = "postgres";
 		String passWord = "111";
 		

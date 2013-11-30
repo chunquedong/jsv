@@ -60,8 +60,8 @@ public class ConnectionFactory {
 			Properties p = new Properties();
 			p.load(in);
 
-			String driver = p.getProperty("driver", "org.h2.Driver");
-			String url = p.getProperty("url", "jdbc:h2:./test");
+			String driver = p.getProperty("driver", "org.sqlite.JDBC");
+			String url = p.getProperty("url", "jdbc:sqlite:test.db");
 			String userName = p.getProperty("userName", "postgres");
 			String passWord = p.getProperty("passWord", "111");
 			String level = p.getProperty("level", "ALL");
@@ -89,6 +89,7 @@ public class ConnectionFactory {
 			Context.setConnection(connectionPool.open());
 			return true;
 		} catch (Exception e) {
+			e.printStackTrace();
 			return false;
 		}
 	}

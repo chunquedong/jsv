@@ -22,14 +22,19 @@ public class TableMaker {
 			}
 			sql.append(SqlUtil.escaptSqlWord(f.getName()));
 			sql.append(" ");
-			sql.append(f.getSqlType());
+			
+			if (table.isAutoGenerateId() && table.getPk() == f) {
+				sql.append("integer PRIMARY KEY autoincrement");
+			} else {
+				sql.append(f.getSqlType());
+			}
 		}
 		
-		if (table.getPk() != null) {
-			sql.append(", primary key (");
-			sql.append(table.getPk().getName());
-			sql.append(")");
-		}
+//		if (table.getPk() != null) {
+//			sql.append(", primary key (");
+//			sql.append(table.getPk().getName());
+//			sql.append(")");
+//		}
 		sql.append(")");
 		return sql.toString();
 	}
