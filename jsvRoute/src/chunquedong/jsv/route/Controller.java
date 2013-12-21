@@ -189,6 +189,6 @@ public abstract class Controller {
 	}
 	
 	protected void render() {
-		render("./view/" + this.getClass().getSimpleName() + "/" + methodName + extName);
+		render("view/" + this.getClass().getSimpleName() + "/" + methodName + extName);
 	}
 }

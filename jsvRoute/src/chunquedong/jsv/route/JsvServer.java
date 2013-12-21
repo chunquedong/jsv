@@ -40,14 +40,14 @@ public class JsvServer extends AbstractHandler {
  
 	@Override
 	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		if (!target.startsWith("/public")) {
+		if (!target.startsWith("/public/")) {
 			rootServlet.service(request, response);
 			baseRequest.setHandled(true);
 		}
 	}
 	
 	public static void start(String packageName, int port, String classPath
-			, boolean isDebug) throws Exception {
+			, boolean isDebug, String profix) throws Exception {
 		Server server = new Server(port);
 		
 		ResourceHandler resourceandler = new ResourceHandler();
@@ -62,6 +62,7 @@ public class JsvServer extends AbstractHandler {
 		
 		routeServlet.setActionPackage(packageName);
 		routeServlet.setClassPath(classPath);
+		routeServlet.setProfix(profix);
 		RouteServlet.setDebugMode(isDebug);
 		servletHandler.setRootServlet(routeServlet);
 		
@@ -88,6 +89,6 @@ public class JsvServer extends AbstractHandler {
 			System.out.println("1.packageName; 2.port; 3.classPath; 4.isDebug");
 			return;
 		}
-		start(packageName, port, classPath, isDebug);
+		start(packageName, port, classPath, isDebug, null);
 	}
 }

@@ -23,15 +23,20 @@ public class RouteServlet extends HttpServlet {
 	private String actionPackage = "";
 	private static boolean isDebug = true;
 	private static HotReloader reloader = null;
+	private String profix = null;
 	
 	@Override
   public void init() throws ServletException {
 		String debug = super.getInitParameter("debugMode");
 		isDebug = ("debug".equals(debug));
-		actionPackage = super.getInitParameter(actionPackage);
-		if (actionPackage == null) {
-			actionPackage = "";
+		String packageName = super.getInitParameter("actionPackage");
+		if (packageName != null) {
+			setActionPackage(packageName);
 		}
+		profix = super.getInitParameter("profix");
+		System.out.println("debugMode:" + isDebug);
+		System.out.println("actionPackage:"+actionPackage);
+		System.out.println("profix:"+profix);
   }
 	
 	public static boolean isDebug() {
@@ -40,6 +45,10 @@ public class RouteServlet extends HttpServlet {
 	
 	public static void setDebugMode(boolean debug) {
 		isDebug = debug;
+	}
+	
+	public void setProfix(String p) {
+		profix = p;
 	}
 	
 	public void setActionPackage(String anctionPackage) {
@@ -56,6 +65,9 @@ public class RouteServlet extends HttpServlet {
 	@Override
 	public void service(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
 		String path = request.getRequestURI();
+		if (profix != null && path.startsWith(profix)) {
+			path = path.substring(profix.length());
+		}
 		
 		String className = "Index";
 
@@ -65,7 +77,7 @@ public class RouteServlet extends HttpServlet {
 			className = pathList[0];
 		}
 		
-		Object servlet = getServletInstance(actionPackage + className);
+		Object servlet = getServletInstance(actionPackage + className, response);
 		if (servlet == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
@@ -123,7 +135,7 @@ public class RouteServlet extends HttpServlet {
 		return count;
 	}
 	
-	private Object getServletInstance(String className)	{
+	private Object getServletInstance(String className, HttpServletResponse response) throws IOException	{
 		Class<?> type;
 		try {
 			if (reloader != null) {
@@ -133,12 +145,24 @@ public class RouteServlet extends HttpServlet {
 			}
 			return type.newInstance();
 		} catch (ClassNotFoundException e) {
+			if (isDebug) {
+				e.printStackTrace(response.getWriter());
+			}
 			return null;
 		} catch (InstantiationException e) {
+			if (isDebug) {
+				e.printStackTrace(response.getWriter());
+			}
 			return null;
 		} catch (IllegalAccessException e) {
+			if (isDebug) {
+				e.printStackTrace(response.getWriter());
+			}
 			return null;
 		} catch (Throwable e) {
+			if (isDebug) {
+				e.printStackTrace(response.getWriter());
+			}
 			return null;
 		}
 	}

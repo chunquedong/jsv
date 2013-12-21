@@ -8,9 +8,11 @@
 
 package chunquedong.jsv.route;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.Enumeration;
+import java.util.Properties;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
@@ -26,7 +28,17 @@ public class VelocityRender {
 	public static VelocityRender getInstance() { return instance; }
 	
 	private VelocityRender() {
-		Velocity.init();
+		java.net.URL url = Controller.class.getResource(File.separator);
+		String classPath = url.getPath();
+		int i = classPath.lastIndexOf(File.separatorChar);
+		String subStr = classPath.substring(0, i);
+		i = subStr.lastIndexOf(File.separatorChar);
+		String fileDir = classPath.substring(0, i+1);
+		System.out.println("Velocity fileDir:" + fileDir);
+		
+		Properties properties = new Properties();
+		properties.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, fileDir);
+		Velocity.init(properties);
 	}
 	
 	public void doRender(String templateFile, ServletRequest request, ServletResponse response) {
