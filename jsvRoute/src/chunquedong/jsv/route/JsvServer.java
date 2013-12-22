@@ -8,56 +8,35 @@
 
 package chunquedong.jsv.route;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.server.Handler;
-import org.eclipse.jetty.server.Request;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.SessionManager;
-import org.eclipse.jetty.server.handler.AbstractHandler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
 import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.server.session.SessionHandler;
  
-public class JsvServer extends AbstractHandler {
+public class JsvServer {
+	private String packageName = "chunquedong.jsv.action.";
+	private int port = 8080;
+	private String classPath = "./bin";
+	private boolean isDebug = true;
+	private String profix = null;
+	private String resourceBase = ".";
 	
-	private HttpServlet rootServlet;
 	
-	public HttpServlet getRootServlet() {
-		return rootServlet;
-	}
-
-	public void setRootServlet(HttpServlet rootServlet) {
-		this.rootServlet = rootServlet;
-	}
- 
-	@Override
-	public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-		if (!target.startsWith("/public/")) {
-			rootServlet.service(request, response);
-			baseRequest.setHandled(true);
-		}
-	}
-	
-	public static void start(String packageName, int port, String classPath
-			, boolean isDebug, String profix) throws Exception {
+	public void start() throws Exception {
 		Server server = new Server(port);
 		
 		ResourceHandler resourceandler = new ResourceHandler();
 		resourceandler.setDirectoriesListed(true);
 		resourceandler.setWelcomeFiles(new String[] { "index.html" });
-		resourceandler.setResourceBase(".");
+		resourceandler.setResourceBase(resourceBase);
 		
 		//ServletHandler servletHandler = new ServletHandler();
 		//servletHandler.addServletWithMapping(HelloServlet.class, "/*");
-		JsvServer servletHandler = new JsvServer();
+		ServletHandler servletHandler = new ServletHandler();
 		RouteServlet routeServlet = new RouteServlet();
 		
 		routeServlet.setActionPackage(packageName);
@@ -76,19 +55,64 @@ public class JsvServer extends AbstractHandler {
 	}
  
 	public static void main(String[] args) throws Exception {
-		String packageName = "chunquedong.jsv.action.";
-		int port = 8080;
-		String classPath = "./bin";
-		boolean isDebug = true;
+		JsvServer server = new JsvServer();
 		if (args.length == 3) {
-			packageName = args[0];
-			port = Integer.parseInt(args[1]);
-			classPath = args[3];
-			isDebug = Boolean.parseBoolean(args[4]);
+			server.packageName = args[0];
+			server.port = Integer.parseInt(args[1]);
+			server.classPath = args[3];
+			server.isDebug = Boolean.parseBoolean(args[4]);
 		} else if (args.length == 1) {
 			System.out.println("1.packageName; 2.port; 3.classPath; 4.isDebug");
 			return;
 		}
-		start(packageName, port, classPath, isDebug, null);
+		server.start();
+	}
+
+	public String getPackageName() {
+		return packageName;
+	}
+
+	public void setPackageName(String packageName) {
+		this.packageName = packageName;
+	}
+
+	public int getPort() {
+		return port;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
+	}
+
+	public String getClassPath() {
+		return classPath;
+	}
+
+	public void setClassPath(String classPath) {
+		this.classPath = classPath;
+	}
+
+	public boolean isDebug() {
+		return isDebug;
+	}
+
+	public void setDebug(boolean isDebug) {
+		this.isDebug = isDebug;
+	}
+
+	public String getProfix() {
+		return profix;
+	}
+
+	public void setProfix(String profix) {
+		this.profix = profix;
+	}
+
+	public String getResourceBase() {
+		return resourceBase;
+	}
+
+	public void setResourceBase(String resourceBase) {
+		this.resourceBase = resourceBase;
 	}
 }
