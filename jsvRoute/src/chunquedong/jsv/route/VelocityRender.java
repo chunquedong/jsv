@@ -8,7 +8,6 @@
 
 package chunquedong.jsv.route;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Enumeration;
@@ -32,16 +31,17 @@ public class VelocityRender {
 
 	public void init(String fileDir) {
 		if (fileDir == null) {
-			java.net.URL url = Controller.class.getResource(File.separator);
+			java.net.URL url = Controller.class.getResource("/");
 			String classPath = url.getPath();
-			int i = classPath.lastIndexOf(File.separatorChar);
+			int i = classPath.lastIndexOf('/');
 			String subStr = classPath.substring(0, i);
-			i = subStr.lastIndexOf(File.separatorChar);
+			i = subStr.lastIndexOf('/');
 			fileDir = classPath.substring(0, i + 1);
 			System.out.println("Velocity fileDir:" + fileDir);
 		}
 		Properties properties = new Properties();
 		properties.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, fileDir);
+		properties.setProperty(Velocity.RUNTIME_LOG_LOGSYSTEM_CLASS, "org.apache.velocity.runtime.log.NullLogChute"); 
 		Velocity.init(properties);
 	}
 

@@ -14,7 +14,7 @@ class JsvClassLoader extends ClassLoader {
 	private HashSet<String> dynaclazns;
 
 	public JsvClassLoader(String basedir, List<String> clazns) {
-		super(null);
+		//super(null);
 		this.basedir = basedir;
 		dynaclazns = new HashSet<String>();
 		for (String className : clazns) {

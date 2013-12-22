@@ -37,6 +37,7 @@ public class RouteServlet extends HttpServlet {
 		System.out.println("debugMode:" + isDebug);
 		System.out.println("actionPackage:"+actionPackage);
 		System.out.println("profix:"+profix);
+		VelocityRender.getInstance().init(null);
   }
 	
 	public static boolean isDebug() {
@@ -59,7 +60,11 @@ public class RouteServlet extends HttpServlet {
   }
 	
 	public void setClassPath(String classPath) {
-		reloader = new HotReloader(classPath);
+		if (classPath != null) {
+			reloader = new HotReloader(classPath);
+		} else {
+			reloader = null;
+		}
 	}
 	
 	@Override
@@ -146,21 +151,25 @@ public class RouteServlet extends HttpServlet {
 			return type.newInstance();
 		} catch (ClassNotFoundException e) {
 			if (isDebug) {
+				e.printStackTrace();
 				e.printStackTrace(response.getWriter());
 			}
 			return null;
 		} catch (InstantiationException e) {
 			if (isDebug) {
+				e.printStackTrace();
 				e.printStackTrace(response.getWriter());
 			}
 			return null;
 		} catch (IllegalAccessException e) {
 			if (isDebug) {
+				e.printStackTrace();
 				e.printStackTrace(response.getWriter());
 			}
 			return null;
 		} catch (Throwable e) {
 			if (isDebug) {
+				e.printStackTrace();
 				e.printStackTrace(response.getWriter());
 			}
 			return null;
