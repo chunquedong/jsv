@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-ajp-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-annotations-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-client-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-continuation-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-deploy-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-http-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-io-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-jmx-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-jndi-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-overlay-deployer-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-plus-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-policy-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-rewrite-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-security-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-server-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-servlet-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-servlets-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-util-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-webapp-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-websocket-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/jetty-xml-8.1.12.v20130726.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/servlet-api-3.0.jar"/>
+	<classpathentry kind="lib" path="/jsvRoute/libs/velocity-1.7-dep.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/jsvRoute"/>
+	<classpathentry kind="output" path="WebRoot/WEB-INF/classes"/>
+</classpath>

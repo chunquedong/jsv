@@ -5,3 +5,6 @@ jsvRecord/test.db
 yuanyan-commons/
 jsvUtil/bin
 jsvRecord/*.db
+jsvDemo/.settings
+jsvDemo/WebRoot/WEB-INF/classes
+jsvDemo/WebRoot/WEB-INF/lib/jsvRoute.jar

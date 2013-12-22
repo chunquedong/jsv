@@ -10,7 +10,7 @@ package chunquedong.jsv.route;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.Writer;
+import java.io.PrintWriter;
 import java.util.Enumeration;
 import java.util.Properties;
 
@@ -25,50 +25,56 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 
 public class VelocityRender {
 	private static VelocityRender instance = new VelocityRender();
-	public static VelocityRender getInstance() { return instance; }
-	
-	private VelocityRender() {
-		java.net.URL url = Controller.class.getResource(File.separator);
-		String classPath = url.getPath();
-		int i = classPath.lastIndexOf(File.separatorChar);
-		String subStr = classPath.substring(0, i);
-		i = subStr.lastIndexOf(File.separatorChar);
-		String fileDir = classPath.substring(0, i+1);
-		System.out.println("Velocity fileDir:" + fileDir);
-		
+
+	public static VelocityRender getInstance() {
+		return instance;
+	}
+
+	public void init(String fileDir) {
+		if (fileDir == null) {
+			java.net.URL url = Controller.class.getResource(File.separator);
+			String classPath = url.getPath();
+			int i = classPath.lastIndexOf(File.separatorChar);
+			String subStr = classPath.substring(0, i);
+			i = subStr.lastIndexOf(File.separatorChar);
+			fileDir = classPath.substring(0, i + 1);
+			System.out.println("Velocity fileDir:" + fileDir);
+		}
 		Properties properties = new Properties();
 		properties.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, fileDir);
 		Velocity.init(properties);
 	}
-	
-	public void doRender(String templateFile, ServletRequest request, ServletResponse response) {
+
+	public void doRender(String templateFile, ServletRequest request,
+	    ServletResponse response) {
 		try {
-			doRender(templateFile, request, response.getWriter(), response.getCharacterEncoding());
+			doRender(templateFile, request, response.getWriter(),
+			    response.getCharacterEncoding());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	
-	public void doRender(String templateFile, ServletRequest request, Writer writer, String encoding)
-	{
+
+	public void doRender(String templateFile, ServletRequest request,
+	    PrintWriter writer, String encoding) {
 		VelocityContext context = new VelocityContext();
-		for (Enumeration<String> attrs=request.getAttributeNames(); attrs.hasMoreElements();) {
+		for (Enumeration<String> attrs = request.getAttributeNames(); attrs
+		    .hasMoreElements();) {
 			String attrName = attrs.nextElement();
 			context.put(attrName, request.getAttribute(attrName));
 		}
-				
-		try
-		{
+
+		try {
 			Template template = Velocity.getTemplate(templateFile, encoding);
 			template.merge(context, writer);
-		}
-		catch( ResourceNotFoundException rnfe )
-		{
-				System.out.println("Example : error : cannot find template " + templateFile );
-		}
-		catch( ParseErrorException pee )
-		{
-				System.out.println("Example : Syntax error in template " + templateFile + ":" + pee );
+		} catch (ResourceNotFoundException rnfe) {
+			if (RouteServlet.isDebug()) {
+				rnfe.printStackTrace(writer);
+			}
+		} catch (ParseErrorException pee) {
+			if (RouteServlet.isDebug()) {
+				pee.printStackTrace(writer);
+			}
 		}
 	}
 }

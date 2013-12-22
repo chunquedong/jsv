@@ -8,6 +8,8 @@
 
 package chunquedong.jsv.route;
 
+import java.io.File;
+
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.SessionManager;
@@ -18,16 +20,35 @@ import org.eclipse.jetty.server.session.HashSessionManager;
 import org.eclipse.jetty.server.session.SessionHandler;
  
 public class JsvServer {
-	private String packageName = "chunquedong.jsv.action.";
+	private String packageName = "";
 	private int port = 8080;
-	private String classPath = "./bin";
+	private String classPath;
 	private boolean isDebug = true;
 	private String profix = null;
-	private String resourceBase = ".";
+	private String resourceBase;
+	private String viewPath;
 	
+	public JsvServer() {
+		java.net.URL url = Controller.class.getResource(File.separator);
+		String classLoadPath = url.getPath();
+		String appPath = getParentPath(classLoadPath);
+		appPath = getParentPath(appPath);
+		appPath = getParentPath(appPath);
+		System.out.println("appPath:" + appPath);
+		
+		classPath = appPath + "/WEB-INF/classes";
+		resourceBase = appPath;
+		viewPath = appPath + "/WEB-INF";
+	}
+	
+	public static String getParentPath(String path) {
+		int i = path.lastIndexOf(File.separatorChar);
+		return path.substring(0, i);
+	}
 	
 	public void start() throws Exception {
 		Server server = new Server(port);
+		VelocityRender.getInstance().init(viewPath);
 		
 		ResourceHandler resourceandler = new ResourceHandler();
 		resourceandler.setDirectoriesListed(true);
@@ -65,6 +86,14 @@ public class JsvServer {
 			System.out.println("1.packageName; 2.port; 3.classPath; 4.isDebug");
 			return;
 		}
+		
+		server.setPackageName("chunquedong.jsv.action.");
+		server.setPort(8080);
+		server.setClassPath("./bin");
+		server.setDebug(true);
+		server.setProfix(null);
+		server.setResourceBase(".");
+		server.setViewPath(".");
 		server.start();
 	}
 
@@ -114,5 +143,13 @@ public class JsvServer {
 
 	public void setResourceBase(String resourceBase) {
 		this.resourceBase = resourceBase;
+	}
+
+	public String getViewPath() {
+		return viewPath;
+	}
+
+	public void setViewPath(String viewPath) {
+		this.viewPath = viewPath;
 	}
 }
