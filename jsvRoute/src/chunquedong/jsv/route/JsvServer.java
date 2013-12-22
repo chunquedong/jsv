@@ -8,8 +8,6 @@
 
 package chunquedong.jsv.route;
 
-import java.io.File;
-
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.SessionManager;
@@ -29,7 +27,7 @@ public class JsvServer {
 	private String viewPath;
 	
 	public JsvServer() {
-		java.net.URL url = Controller.class.getResource(File.separator);
+		java.net.URL url = this.getClass().getResource("/");
 		String classLoadPath = url.getPath();
 		String appPath = getParentPath(classLoadPath);
 		appPath = getParentPath(appPath);
@@ -42,7 +40,7 @@ public class JsvServer {
 	}
 	
 	public static String getParentPath(String path) {
-		int i = path.lastIndexOf(File.separatorChar);
+		int i = path.lastIndexOf('/');
 		return path.substring(0, i);
 	}
 	
