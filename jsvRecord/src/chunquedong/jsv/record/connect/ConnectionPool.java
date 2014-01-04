@@ -10,6 +10,7 @@ package chunquedong.jsv.record.connect;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
@@ -33,14 +34,17 @@ public class ConnectionPool {
 	
 	public Connection open() {
 		while (list.size() > 0) {
-			Connection conn = list.poll();
 			try {
-				if (!conn.isClosed()) {
-					return conn;
+				Connection conn = list.poll();
+				try {
+					if (conn != null && !conn.isClosed() && conn.isValid(1)) {
+						return conn;
+					}
+				} catch (SQLException e) {
+					e.printStackTrace();
+					DbUtil.closeConnection(conn);
 				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-				DbUtil.closeConnection(conn);
+			} catch (NoSuchElementException e) {
 			}
 		}
 		return DbUtil.getConnection(driver, url, userName, passWord);
