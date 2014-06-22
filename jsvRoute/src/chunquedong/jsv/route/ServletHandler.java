@@ -24,6 +24,10 @@ public class ServletHandler extends AbstractHandler {
 		 
 			@Override
 			public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+				if (target.endsWith("favicon")) {
+					return;
+				}
+				
 				if (!target.startsWith("/public/")) {
 					rootServlet.service(request, response);
 					baseRequest.setHandled(true);

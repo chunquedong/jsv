@@ -76,10 +76,10 @@ public class JsvServer {
 	public static void main(String[] args) throws Exception {
 		JsvServer server = new JsvServer();
 		if (args.length == 3) {
-			server.packageName = args[0];
-			server.port = Integer.parseInt(args[1]);
-			server.classPath = args[3];
-			server.isDebug = Boolean.parseBoolean(args[4]);
+			server.setPackageName(args[0]);
+			server.setPort(Integer.parseInt(args[1]));
+			server.setClassPath(args[3]);
+			server.setDebug(Boolean.parseBoolean(args[4]));
 		} else if (args.length == 1) {
 			System.out.println("1.packageName; 2.port; 3.classPath; 4.isDebug");
 			return;
