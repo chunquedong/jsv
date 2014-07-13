@@ -36,8 +36,15 @@ public class ConnectionPool {
 		while (list.size() > 0) {
 			try {
 				Connection conn = list.poll();
+				boolean valid = true;
 				try {
-					if (conn != null && !conn.isClosed() && conn.isValid(1)) {
+					valid = conn.isValid(1);
+				} catch (Throwable ex) {
+					System.err.println("ERROR:"+ex.getMessage());
+				}
+				
+				try {
+					if (valid && conn != null && !conn.isClosed()) {
 						return conn;
 					}
 				} catch (SQLException e) {

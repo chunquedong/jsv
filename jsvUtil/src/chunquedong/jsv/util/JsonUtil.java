@@ -8,8 +8,6 @@
 
 package chunquedong.jsv.util;
 
-import it.sauronsoftware.base64.Base64;
-
 import java.util.List;
 
 import chunquedong.jsv.record.model.DataType;
@@ -50,7 +48,7 @@ public class JsonUtil {
 			sb.append(",\"").append(name).append("\":");
 			
 			if (f.getType() == DataType.jbyteArray) {
-				String code = new String(Base64.encode((byte[])r.get(i)));
+				String code = (Base64.encode((byte[])r.get(i)));
 				sb.append("\"").append(code).append("\"");
 			} else {
 				String val = quote(r.get(i).toString());
