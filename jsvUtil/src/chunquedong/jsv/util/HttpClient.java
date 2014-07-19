@@ -86,6 +86,7 @@ public class HttpClient {
 			BufferedOutputStream os = new BufferedOutputStream(out);
 			try {
 				os.write(request.getBytes("UTF-8"));
+				os.flush();
 			} catch (UnsupportedEncodingException e) {
 				e.printStackTrace();
 			} catch (IOException e) {
