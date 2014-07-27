@@ -26,10 +26,10 @@ public class HttpClient {
 		executor = Executors.newFixedThreadPool(numThread);
 	}
 
-	static interface HttpHandler extends Callback {
-		void write(OutputStream out);
+	public static interface HttpHandler extends Callback {
+		void write(OutputStream out) throws IOException;
 
-		void read(InputStream in);
+		void read(InputStream in) throws IOException;
 	}
 
 	public static void initCookie() {
