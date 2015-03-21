@@ -38,9 +38,11 @@ public class HttpClient {
 	}
 
 	public static String getCookie(String uri, String name) {
-		CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
+		CookieManager cookieManager = (CookieManager) CookieHandler
+				.getDefault();
 		try {
-			List<HttpCookie> list = cookieManager.getCookieStore().get(new URI(uri));
+			List<HttpCookie> list = cookieManager.getCookieStore().get(
+					new URI(uri));
 			for (HttpCookie c : list) {
 				if (c.getName().equals(name)) {
 					return c.getValue();
@@ -53,7 +55,8 @@ public class HttpClient {
 	}
 
 	public static void addCookie(String uri, String name, String value) {
-		CookieManager cookieManager = (CookieManager) CookieHandler.getDefault();
+		CookieManager cookieManager = (CookieManager) CookieHandler
+				.getDefault();
 		try {
 			URI u = new URI(uri);
 			HttpCookie c = new HttpCookie(name, value);
@@ -66,9 +69,10 @@ public class HttpClient {
 	}
 
 	public static String streamToString(InputStream is) throws IOException {
-		BufferedReader in = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+		BufferedReader in = new BufferedReader(new InputStreamReader(is,
+				"UTF-8"));
 		String line = null;
-		StringBuffer sb = new StringBuffer();
+		StringBuilder sb = new StringBuilder();
 
 		while ((line = in.readLine()) != null) {
 			sb.append(line);
@@ -107,13 +111,28 @@ public class HttpClient {
 	};
 
 	public static String get(String urlStr) throws IOException {
-		StringHttpHandler handler = new StringHttpHandler();
-		getStream(urlStr, handler);
-		return handler.response;
+		InputStream in = null;
+		String str = null;
+		try {
+			in = getStream(urlStr);
+			if (in == null) {
+				return null;
+			}
+			str = streamToString(in);
+		} finally {
+			try {
+				if (in != null) {
+					in.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+		return str;
 	}
 
 	public static void getStream(String urlStr, HttpHandler handler)
-	    throws IOException {
+			throws IOException {
 		URL url = new URL(urlStr);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -124,7 +143,19 @@ public class HttpClient {
 		} else {
 			handler.call(false, null);
 		}
-		connection.disconnect();
+		// connection.disconnect();
+	}
+
+	public static InputStream getStream(String urlStr) throws IOException {
+		URL url = new URL(urlStr);
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+		if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+			InputStream is = connection.getInputStream();
+			return is;
+		} else {
+			return null;
+		}
 	}
 
 	public static String post(String urlStr, String content) throws IOException {
@@ -135,7 +166,7 @@ public class HttpClient {
 	}
 
 	public static void postStream(String urlStr, HttpHandler handler)
-	    throws IOException {
+			throws IOException {
 		URL url = new URL(urlStr);
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
@@ -145,7 +176,7 @@ public class HttpClient {
 		connection.setUseCaches(false);
 		connection.setInstanceFollowRedirects(false);
 		connection.setRequestProperty("Content-Type",
-		    "application/x-www-form-urlencoded");
+				"application/x-www-form-urlencoded");
 		connection.connect();
 		OutputStream out = connection.getOutputStream();
 		handler.write(out);
@@ -159,7 +190,32 @@ public class HttpClient {
 		} else {
 			handler.call(false, null);
 		}
-		connection.disconnect();
+		// connection.disconnect();
+	}
+
+	public static InputStream postStream(String urlStr, InputStream in)
+			throws IOException {
+		URL url = new URL(urlStr);
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+		connection.setDoInput(true);
+		connection.setDoOutput(true);
+		connection.setRequestMethod("POST");
+		connection.setUseCaches(false);
+		connection.setInstanceFollowRedirects(false);
+		connection.setRequestProperty("Content-Type",
+				"application/x-www-form-urlencoded");
+		connection.connect();
+		OutputStream out = connection.getOutputStream();
+		StreamUtil.pipe(in, out);
+		out.close();
+
+		if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+			InputStream is = connection.getInputStream();
+			return is;
+		} else {
+			return null;
+		}
 	}
 
 	public void asyGetStream(final String url, final HttpHandler handler) {
@@ -208,7 +264,7 @@ public class HttpClient {
 	}
 
 	public void asyPost(final String url, final String content,
-	    final Callback callback) {
+			final Callback callback) {
 		executor.execute(new Runnable() {
 			@Override
 			public void run() {
