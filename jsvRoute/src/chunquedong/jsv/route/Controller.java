@@ -194,4 +194,89 @@ public abstract class Controller {
 		render("view/" + this.getClass().getSimpleName() + "/" + methodName
 				+ extName);
 	}
+
+	//////////////////////////////////////////////////////////////////////
+	
+	protected void sendOk() {
+		try {
+			response.sendError(HttpServletResponse.SC_OK);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void sendError() {
+		try {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void sendNotFound() {
+		try {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void redirect(String path) {
+		try {
+			response.sendRedirect(path);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected String getString(String name, String defaultValue) {
+		String s = request.getParameter(name);
+		if (s == null)
+			return defaultValue;
+		return s;
+	}
+
+	protected int getInt(String name, int defaultValue) {
+		String s = request.getParameter(name);
+		if (s == null)
+			return defaultValue;
+		try {
+			return Integer.parseInt(s);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
+	protected long getLong(String name, long defaultValue) {
+		String s = request.getParameter(name);
+		if (s == null)
+			return defaultValue;
+		try {
+			return Long.parseLong(s);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
+	protected float getFloat(String name, float defaultValue) {
+		String s = request.getParameter(name);
+		if (s == null)
+			return defaultValue;
+		try {
+			return Float.parseFloat(s);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+	
+	protected double getDouble(String name, double defaultValue) {
+		String s = request.getParameter(name);
+		if (s == null)
+			return defaultValue;
+		try {
+			return Double.parseDouble(s);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
 }
