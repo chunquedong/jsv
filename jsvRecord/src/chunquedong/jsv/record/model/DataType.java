@@ -8,6 +8,10 @@
 
 package chunquedong.jsv.record.model;
 
+import java.math.BigDecimal;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 
 
 public class DataType {
@@ -83,4 +87,233 @@ public class DataType {
 		}
 	}
 	
+	public static Class<?> getClass(int type) {
+		switch (type) {
+		case DataType.jinteger:
+			return Integer.class;
+		case DataType.jbyte:
+			return Byte.class;
+		case DataType.jshort:
+			return Short.class;
+		case DataType.jlong:
+			return Long.class;
+		case DataType.jboolean:
+			return Boolean.class;
+		case DataType.jstring:
+			return String.class;
+		case DataType.jbyteArray:
+			return byte[].class;
+		case DataType.jdate:
+			return Date.class;
+		case DataType.jtime:
+			return Time.class;
+		case DataType.jtimestamp:
+			return Timestamp.class;
+		case DataType.jdecimal:
+			return BigDecimal.class;
+		case DataType.jdouble:
+			return Double.class;
+		case DataType.jfloat:
+			return Float.class;
+		case DataType.jother:
+			return Object.class;
+		default:
+			return Object.class;
+		}
+	}
+	
+	public static String toString(int type, Object obj) {
+		if (obj == null) {
+			return "";
+		}
+		return obj.toString();
+	}
+	
+	public static Object fromString(int type, String s) {
+		switch (type) {
+		case DataType.jinteger:
+			return Integer.parseInt(s);
+		case DataType.jbyte:
+			return Byte.parseByte(s);
+		case DataType.jshort:
+			return Short.parseShort(s);
+		case DataType.jlong:
+			return Long.parseLong(s);
+		case DataType.jboolean:
+			return Boolean.parseBoolean(s);
+		case DataType.jstring:
+			return s;
+		case DataType.jbyteArray:
+			//return Base64.decode(s);
+			throw new RuntimeException("TODO");
+		case DataType.jdate:
+			return Date.valueOf(s);
+		case DataType.jtime:
+			return Time.valueOf(s);
+		case DataType.jtimestamp:
+			return Timestamp.valueOf(s);
+		case DataType.jdecimal:
+			return BigDecimal.valueOf(Double.parseDouble(s));
+		case DataType.jdouble:
+			return Double.parseDouble(s);
+		case DataType.jfloat:
+			return Float.parseFloat(s);
+		case DataType.jother:
+			throw new RuntimeException("TODO");
+		default:
+			throw new RuntimeException("TODO");
+		}
+	}
+	
+	public static long toLong(int type, Object obj) {
+		if (obj == null) {
+			return 0;
+		}
+		
+		switch (type) {
+		case DataType.jinteger:
+			return (Integer)obj;
+		case DataType.jbyte:
+			return (Byte)obj;
+		case DataType.jshort:
+			return (Short)obj;
+		case DataType.jlong:
+			return (Long)obj;
+		case DataType.jboolean:
+			return ((Boolean)obj)?1:0;
+		case DataType.jstring:
+			return Long.parseLong((String)obj);
+		case DataType.jbyteArray:
+			break;
+		case DataType.jdate:
+			return ((Date)obj).getTime();
+		case DataType.jtime:
+			return ((Time)obj).getTime();
+		case DataType.jtimestamp:
+			return ((Timestamp)obj).getTime();
+		case DataType.jdecimal:
+			return ((BigDecimal)obj).longValue();
+		case DataType.jdouble:
+			return ((Double)obj).longValue();
+		case DataType.jfloat:
+			return ((Float)obj).longValue();
+		case DataType.jother:
+			break;
+		default:
+			break;
+		}
+		throw new RuntimeException("unsupport");
+	}
+	
+	public static Object fromLong(int type, long s) {
+		switch (type) {
+		case DataType.jinteger:
+			return Integer.valueOf((int) s);
+		case DataType.jbyte:
+			return Byte.valueOf((byte)s);
+		case DataType.jshort:
+			return Short.valueOf((short)s);
+		case DataType.jlong:
+			return Long.valueOf(s);
+		case DataType.jboolean:
+			return Boolean.valueOf(s != 0);
+		case DataType.jstring:
+			return (""+s);
+		case DataType.jbyteArray:
+			//return Base64.decode(s);
+			throw new RuntimeException("TODO");
+		case DataType.jdate:
+			return new Date(s);
+		case DataType.jtime:
+			return new Time(s);
+		case DataType.jtimestamp:
+			return new Timestamp(s);
+		case DataType.jdecimal:
+			return BigDecimal.valueOf(s);
+		case DataType.jdouble:
+			return Double.valueOf(s);
+		case DataType.jfloat:
+			return Float.valueOf(s);
+		case DataType.jother:
+			throw new RuntimeException("TODO");
+		default:
+			throw new RuntimeException("TODO");
+		}
+	}
+	
+	public static double toDouble(int type, Object obj) {
+		if (obj == null) {
+			return 0;
+		}
+		
+		switch (type) {
+		case DataType.jinteger:
+			return (Integer)obj;
+		case DataType.jbyte:
+			return (Byte)obj;
+		case DataType.jshort:
+			return (Short)obj;
+		case DataType.jlong:
+			return (Long)obj;
+		case DataType.jboolean:
+			return ((Boolean)obj)?1:0;
+		case DataType.jstring:
+			return Long.parseLong((String)obj);
+		case DataType.jbyteArray:
+			break;
+		case DataType.jdate:
+			return ((Date)obj).getTime();
+		case DataType.jtime:
+			return ((Time)obj).getTime();
+		case DataType.jtimestamp:
+			return ((Timestamp)obj).getNanos();
+		case DataType.jdecimal:
+			return ((BigDecimal)obj).longValue();
+		case DataType.jdouble:
+			return ((Double)obj);
+		case DataType.jfloat:
+			return ((Float)obj).doubleValue();
+		case DataType.jother:
+			break;
+		default:
+			break;
+		}
+		throw new RuntimeException("unsupport");
+	}
+	
+	public static Object fromDouble(int type, double s) {
+		switch (type) {
+		case DataType.jinteger:
+			return Integer.valueOf((int) s);
+		case DataType.jbyte:
+			return Byte.valueOf((byte)s);
+		case DataType.jshort:
+			return Short.valueOf((short)s);
+		case DataType.jlong:
+			return Long.valueOf((long)s);
+		case DataType.jboolean:
+			return Boolean.valueOf(s != 0);
+		case DataType.jstring:
+			return (""+s);
+		case DataType.jbyteArray:
+			//return Base64.decode(s);
+			throw new RuntimeException("TODO");
+		case DataType.jdate:
+			return new Date((long)s);
+		case DataType.jtime:
+			return new Time((long)s);
+		case DataType.jtimestamp:
+			return new Timestamp((long)s);
+		case DataType.jdecimal:
+			return BigDecimal.valueOf(s);
+		case DataType.jdouble:
+			return Double.valueOf(s);
+		case DataType.jfloat:
+			return Float.valueOf((float)s);
+		case DataType.jother:
+			throw new RuntimeException("TODO");
+		default:
+			throw new RuntimeException("TODO");
+		}
+	}
 }

@@ -78,5 +78,51 @@ public class ArrayRecord implements Record {
 	public String toString() {
 		return schema.getName() +":"+ Arrays.toString(values);
 	}
+	
+	//////////////////////////////////////////////////////////////////////
 
+	public String getString(String name) {
+		Object obj = get(name);
+		if (obj == null) {
+			return "";
+		}
+		return obj.toString();
+	}
+	
+	public void setString(String name, String val) {
+		int i = schema.getIndex(name);
+		Field field = schema.get(i);
+		Object obj = DataType.fromString(field.getType(), val);
+		set(i, obj);
+	}
+	
+	public long getLongInt(String name) {
+		int i = schema.getIndex(name);
+		Field field = schema.get(i);
+		Object obj = get(i);
+		long val = DataType.toLong(field.getType(), obj);
+		return val;
+	}
+	
+	public void setLongInt(String name, long val) {
+		int i = schema.getIndex(name);
+		Field field = schema.get(i);
+		Object obj = DataType.fromLong(field.getType(), val);
+		set(i, obj);
+	}
+	
+	public double getDoubleFloat(String name) {
+		int i = schema.getIndex(name);
+		Field field = schema.get(i);
+		Object obj = get(i);
+		double val = DataType.toDouble(field.getType(), obj);
+		return val;
+	}
+	
+	public void setDoubleFloat(String name, double val) {
+		int i = schema.getIndex(name);
+		Field field = schema.get(i);
+		Object obj = DataType.fromDouble(field.getType(), val);
+		set(i, obj);
+	}
 }
