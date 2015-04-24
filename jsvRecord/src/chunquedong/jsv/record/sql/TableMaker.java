@@ -9,9 +9,10 @@
 package chunquedong.jsv.record.sql;
 
 import chunquedong.jsv.record.model.*;
+import chunquedong.jsv.record.sql.dialect.SqlDialect;
 
 public class TableMaker {
-	public static String createTable(Schema table) {
+	public static String createTable(Schema table, SqlDialect dialect) {
 		StringBuilder sql = new StringBuilder();
 		sql.append("create table ").append(table.getName()).append("(");
 
@@ -20,14 +21,7 @@ public class TableMaker {
 			if (i != 0) {
 				sql.append(",");
 			}
-			sql.append(SqlUtil.escaptSqlWord(f.getName()));
-			sql.append(" ");
-			
-			if (table.isAutoGenerateId() && table.getPk() == f) {
-				sql.append("integer PRIMARY KEY autoincrement");
-			} else {
-				sql.append(f.getSqlType());
-			}
+			dialect.createTableColumn(table, f, sql);
 		}
 		
 //		if (table.getPk() != null) {

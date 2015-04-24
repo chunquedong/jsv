@@ -17,10 +17,12 @@ import java.util.logging.Logger;
 
 import chunquedong.jsv.record.connect.DbUtil;
 import chunquedong.jsv.record.model.*;
+import chunquedong.jsv.record.sql.dialect.SqlDialect;
 
 public class SqlExecutor {
 	static Logger log = Logger.getLogger("jsvRecord");
-	
+	public SqlDialect dialect = new SqlDialect();
+
 	public void insert(Schema table, Connection db, Object obj)
 	{
 		String sql = InsertMaker.getSql(table);
@@ -397,7 +399,7 @@ public class SqlExecutor {
 	
 	public void createTable(Schema table, Connection db)
 	{
-		String sql = TableMaker.createTable(table);
+		String sql = TableMaker.createTable(table, dialect);
 		if (log.isLoggable(Level.FINE))
 		{
 			log.fine(sql);

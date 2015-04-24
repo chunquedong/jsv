@@ -17,6 +17,7 @@ import java.util.List;
 import chunquedong.jsv.record.connect.DbUtil;
 import chunquedong.jsv.record.model.*;
 import chunquedong.jsv.record.sql.SqlExecutor;
+import chunquedong.jsv.record.sql.dialect.SqlDialect;
 
 public class Context {
 	private static ThreadLocal<Connection> connection = new ThreadLocal<Connection>();
@@ -31,6 +32,14 @@ public class Context {
 	
 	public static void setConnection(Connection conn) {
 		connection.set(conn);
+	}
+	
+	public SqlDialect getDialect() {
+		return executor.dialect;
+	}
+
+	public void setDialect(SqlDialect dialect) {
+		this.executor.dialect = dialect;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////

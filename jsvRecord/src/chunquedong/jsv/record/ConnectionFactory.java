@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 
 import chunquedong.jsv.record.connect.ConnectionPool;
 import chunquedong.jsv.record.model.Schema;
+import chunquedong.jsv.record.sql.dialect.H2Dialect;
 
 public class ConnectionFactory {
 	static Logger log = Logger.getLogger("jsvRecord");
@@ -40,6 +41,10 @@ public class ConnectionFactory {
 		connectionPool = new ConnectionPool(driver, url, userName, passWord,
 		    poolSize);
 		context = new Context();
+		
+		if ("org.h2.Driver".equals(driver)) {
+			context.setDialect(new H2Dialect());
+		}
 	}
 
 	public void initFromConfig(String path) {
