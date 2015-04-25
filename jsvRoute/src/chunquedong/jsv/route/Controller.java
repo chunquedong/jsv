@@ -165,6 +165,8 @@ public abstract class Controller {
 		try {
 			if (RouteServlet.isDebug()) {
 				e.printStackTrace(response.getWriter());
+				sendError();
+				e.printStackTrace();
 			} else {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}

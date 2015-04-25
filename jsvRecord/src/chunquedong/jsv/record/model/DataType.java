@@ -316,4 +316,35 @@ public class DataType {
 			throw new RuntimeException("TODO");
 		}
 	}
+	
+	public static java.util.Date toDate(int type, Object obj) {
+		if (obj == null) {
+			return null;
+		}
+		
+		switch (type) {
+		case DataType.jdate:
+			return ((Date)obj);
+		case DataType.jtime:
+			return ((Time)obj);
+		case DataType.jtimestamp:
+			return ((Timestamp)obj);
+		default:
+			break;
+		}
+		throw new RuntimeException("unsupport");
+	}
+	
+	public static Object fromDate(int type, java.util.Date s) {
+		switch (type) {
+		case DataType.jdate:
+			return new Date(s.getTime());
+		case DataType.jtime:
+			return new Time(s.getTime());
+		case DataType.jtimestamp:
+			return new Timestamp(s.getTime());
+		default:
+			throw new RuntimeException("TODO");
+		}
+	}
 }

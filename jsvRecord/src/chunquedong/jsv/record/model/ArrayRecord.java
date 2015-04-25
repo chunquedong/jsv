@@ -125,4 +125,19 @@ public class ArrayRecord implements Record {
 		Object obj = DataType.fromDouble(field.getType(), val);
 		set(i, obj);
 	}
+	
+	public java.util.Date getDate(String name) {
+		int i = schema.getIndex(name);
+		Field field = schema.get(i);
+		Object obj = get(i);
+		java.util.Date val = DataType.toDate(field.getType(), obj);
+		return val;
+	}
+	
+	public void setDate(String name, java.util.Date val) {
+		int i = schema.getIndex(name);
+		Field field = schema.get(i);
+		Object obj = DataType.fromDate(field.getType(), val);
+		set(i, obj);
+	}
 }
