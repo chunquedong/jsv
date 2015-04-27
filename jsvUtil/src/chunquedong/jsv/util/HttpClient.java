@@ -15,16 +15,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class HttpClient {
-
-	Executor executor;
-
-	public HttpClient(int numThread) {
-		executor = Executors.newFixedThreadPool(numThread);
-	}
 
 	public static interface HttpHandler extends Callback {
 		void write(OutputStream out) throws IOException;
@@ -216,70 +208,5 @@ public class HttpClient {
 		} else {
 			return null;
 		}
-	}
-
-	public void asyGetStream(final String url, final HttpHandler handler) {
-		executor.execute(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					getStream(url, handler);
-				} catch (Throwable e) {
-					handler.call(false, null);
-				}
-			}
-		});
-	}
-
-	public void asyPostStream(final String url, final HttpHandler handler) {
-		executor.execute(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					postStream(url, handler);
-				} catch (Throwable e) {
-					handler.call(false, null);
-				}
-			}
-		});
-	}
-
-	public void asyGet(final String url, final Callback callback) {
-		executor.execute(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					String s = get(url);
-					if (s != null) {
-						callback.call(true, s);
-					} else {
-						callback.call(false, null);
-					}
-				} catch (Throwable e) {
-					e.printStackTrace();
-					callback.call(false, e);
-				}
-			}
-		});
-	}
-
-	public void asyPost(final String url, final String content,
-			final Callback callback) {
-		executor.execute(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					String s = post(url, content);
-					if (s != null) {
-						callback.call(true, s);
-					} else {
-						callback.call(false, null);
-					}
-				} catch (Throwable e) {
-					e.printStackTrace();
-					callback.call(false, e);
-				}
-			}
-		});
 	}
 }

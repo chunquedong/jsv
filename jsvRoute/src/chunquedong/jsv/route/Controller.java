@@ -81,24 +81,31 @@ public abstract class Controller {
 	private void invoke(Method method, String param) throws IOException {
 		int paramSize = method.getParameterTypes().length;
 		try {
+			Object ret;
 			if (paramSize == 1) {
 				if (method.getParameterTypes()[0] == long.class
 						|| method.getParameterTypes()[0] == Long.class) {
 					long l = Long.parseLong(param);
-					method.invoke(this, l);
+					ret = method.invoke(this, l);
 				} else if (method.getParameterTypes()[0] == int.class
 						|| method.getParameterTypes()[0] == Integer.class) {
 					int l = Integer.parseInt(param);
-					method.invoke(this, l);
+					ret = method.invoke(this, l);
 				} else {
-					method.invoke(this, param);
+					ret = method.invoke(this, param);
 				}
 			} else if (paramSize == 0) {
-				method.invoke(this);
+				ret = method.invoke(this);
 			} else {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 				return;
 			}
+			
+			//send result
+			if (ret != null) {
+				response.getWriter().print(ret);
+			}
+			
 		} catch (IllegalArgumentException e) {
 			onError(e);
 		} catch (IllegalAccessException e) {
@@ -197,8 +204,16 @@ public abstract class Controller {
 				+ extName);
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	
+	// ////////////////////////////////////////////////////////////////////
+
+	protected void sendText(String msg) {
+		try {
+			response.getWriter().print(msg);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	protected void sendOk() {
 		try {
 			response.sendError(HttpServletResponse.SC_OK);
@@ -206,7 +221,7 @@ public abstract class Controller {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void sendError() {
 		try {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
@@ -214,7 +229,7 @@ public abstract class Controller {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void sendNotFound() {
 		try {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -222,7 +237,7 @@ public abstract class Controller {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected void redirect(String path) {
 		try {
 			response.sendRedirect(path);
@@ -230,12 +245,23 @@ public abstract class Controller {
 			e.printStackTrace();
 		}
 	}
-	
+
 	protected String getString(String name, String defaultValue) {
 		String s = request.getParameter(name);
 		if (s == null)
 			return defaultValue;
 		return s;
+	}
+	
+	protected boolean getBoolean(String name, boolean defaultValue) {
+		String s = request.getParameter(name);
+		if (s == null)
+			return defaultValue;
+		return "true".equals(s);
+	}
+	
+	protected boolean isPresent(String name) {
+		return request.getParameter(name) != null;
 	}
 
 	protected int getInt(String name, int defaultValue) {
@@ -248,7 +274,7 @@ public abstract class Controller {
 			return defaultValue;
 		}
 	}
-	
+
 	protected long getLong(String name, long defaultValue) {
 		String s = request.getParameter(name);
 		if (s == null)
@@ -259,7 +285,7 @@ public abstract class Controller {
 			return defaultValue;
 		}
 	}
-	
+
 	protected float getFloat(String name, float defaultValue) {
 		String s = request.getParameter(name);
 		if (s == null)
@@ -270,7 +296,7 @@ public abstract class Controller {
 			return defaultValue;
 		}
 	}
-	
+
 	protected double getDouble(String name, double defaultValue) {
 		String s = request.getParameter(name);
 		if (s == null)
