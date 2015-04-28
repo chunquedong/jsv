@@ -133,7 +133,7 @@ public class HttpClient {
 			handler.read(is);
 			is.close();
 		} else {
-			handler.call(false, null);
+			handler.call(false, connection.getResponseCode());
 		}
 		// connection.disconnect();
 	}
@@ -180,7 +180,7 @@ public class HttpClient {
 			handler.read(is);
 			is.close();
 		} else {
-			handler.call(false, null);
+			handler.call(false, connection.getResponseCode());
 		}
 		// connection.disconnect();
 	}

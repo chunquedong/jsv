@@ -338,10 +338,19 @@ public class DataType {
 	public static Object fromDate(int type, java.util.Date s) {
 		switch (type) {
 		case DataType.jdate:
+			if (s instanceof Date) {
+				return s;
+			}
 			return new Date(s.getTime());
 		case DataType.jtime:
+			if (s instanceof Time) {
+				return s;
+			}
 			return new Time(s.getTime());
 		case DataType.jtimestamp:
+			if (s instanceof Timestamp) {
+				return s;
+			}
 			return new Timestamp(s.getTime());
 		default:
 			throw new RuntimeException("TODO");
