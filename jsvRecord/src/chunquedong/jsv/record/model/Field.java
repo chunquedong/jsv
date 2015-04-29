@@ -101,6 +101,11 @@ public class Field implements Serializable {
 	public void setValue(Object obj, Object val) {
 		if (obj instanceof Record) {
 			Record r = (Record)obj;
+			
+			if (type == DataType.jlong && val instanceof Integer) {
+				val = (long)((Integer)val);
+			}
+			
 			r.set(index, val);
 		}
 	}
