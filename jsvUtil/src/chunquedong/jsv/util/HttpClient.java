@@ -135,7 +135,6 @@ public class HttpClient {
 		} else {
 			handler.call(false, connection.getResponseCode());
 		}
-		// connection.disconnect();
 	}
 
 	public static InputStream getStream(String urlStr) throws IOException {
@@ -146,6 +145,7 @@ public class HttpClient {
 			InputStream is = connection.getInputStream();
 			return is;
 		} else {
+			System.err.print("response code: " + connection.getResponseCode());
 			return null;
 		}
 	}
@@ -182,7 +182,6 @@ public class HttpClient {
 		} else {
 			handler.call(false, connection.getResponseCode());
 		}
-		// connection.disconnect();
 	}
 
 	public static InputStream postStream(String urlStr, InputStream in)
@@ -206,6 +205,7 @@ public class HttpClient {
 			InputStream is = connection.getInputStream();
 			return is;
 		} else {
+			System.err.print("response code: " + connection.getResponseCode());
 			return null;
 		}
 	}
