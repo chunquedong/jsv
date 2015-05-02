@@ -18,11 +18,49 @@ import java.util.List;
 
 public class HttpClient {
 
-	public static interface HttpHandler extends Callback {
+	public static interface HttpHandler {
 		void write(OutputStream out) throws IOException;
 
 		void read(InputStream in) throws IOException;
+
+		void onError(int code, Object msg);
 	}
+
+	public static class HttpException extends Exception {
+		private static final long serialVersionUID = 3369739421484457943L;
+
+		public int responseCode = 0;
+		public Object error = null;
+
+		public HttpException(int responseCode) {
+			this.responseCode = responseCode;
+		}
+
+		public HttpException(int responseCode, String error) {
+			super(error);
+			this.responseCode = responseCode;
+			this.error = error;
+		}
+
+		public HttpException(int responseCode, Throwable error) {
+			super(error);
+			this.responseCode = responseCode;
+			this.error = error;
+		}
+
+		public static HttpException make(int code, Object error) {
+			if (error == null) {
+				return new HttpException(code);
+			} else if (error instanceof Throwable) {
+				return new HttpException(code, (Throwable) error);
+			} else {
+				return new HttpException(code, error.toString());
+			}
+		}
+	}
+
+	// ////////////////////////////////////////////////////////////////////
+	// cookie
 
 	public static void initCookie() {
 		CookieManager cookieManager = new CookieManager();
@@ -60,6 +98,9 @@ public class HttpClient {
 		}
 	}
 
+	// ////////////////////////////////////////////////////////////////////
+	// util
+
 	public static String streamToString(InputStream is) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(is,
 				"UTF-8"));
@@ -72,9 +113,11 @@ public class HttpClient {
 		return sb.toString();
 	}
 
-	static class StringHttpHandler implements HttpHandler {
+	public static class StringHttpHandler implements HttpHandler {
 		public String response = null;
 		public String request = null;
+		public int responseCode = 0;
+		public Object error = null;
 
 		public void write(OutputStream out) {
 			if (request == null)
@@ -98,115 +141,146 @@ public class HttpClient {
 		}
 
 		@Override
-		public void call(boolean success, Object arg) {
+		public void onError(int code, Object msg) {
+			responseCode = code;
+			error = msg;
+			System.err.println("response code: " + code + ", message:" + msg);
 		}
 	};
 
-	public static String get(String urlStr) throws IOException {
-		InputStream in = null;
-		String str = null;
-		try {
-			in = getStream(urlStr);
-			if (in == null) {
-				return null;
-			}
-			str = streamToString(in);
-		} finally {
-			try {
-				if (in != null) {
-					in.close();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return str;
-	}
-
-	public static void getStream(String urlStr, HttpHandler handler)
-			throws IOException {
-		URL url = new URL(urlStr);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-		if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-			InputStream is = connection.getInputStream();
-			handler.read(is);
-			is.close();
-		} else {
-			handler.call(false, connection.getResponseCode());
-		}
-	}
-
-	public static InputStream getStream(String urlStr) throws IOException {
-		URL url = new URL(urlStr);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-		if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-			InputStream is = connection.getInputStream();
-			return is;
-		} else {
-			System.err.print("response code: " + connection.getResponseCode());
-			return null;
-		}
-	}
-
-	public static String post(String urlStr, String content) throws IOException {
+	public static String get(String urlStr) throws HttpException {
 		StringHttpHandler handler = new StringHttpHandler();
-		handler.request = content;
-		postStream(urlStr, handler);
+		handler.request = null;
+		doRequest(urlStr, "GET", handler);
+		if (handler.responseCode != 0) {
+			throw HttpException.make(handler.responseCode, handler.error);
+		}
 		return handler.response;
 	}
 
-	public static void postStream(String urlStr, HttpHandler handler)
-			throws IOException {
-		URL url = new URL(urlStr);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+	public static String post(String urlStr, String content)
+			throws HttpException {
+		StringHttpHandler handler = new StringHttpHandler();
+		handler.request = content;
+		doRequest(urlStr, "POST", handler);
+		if (handler.responseCode != 0) {
+			throw HttpException.make(handler.responseCode, handler.error);
+		}
+		return handler.response;
+	}
 
-		connection.setDoInput(true);
-		connection.setDoOutput(true);
-		connection.setRequestMethod("POST");
-		connection.setUseCaches(false);
-		connection.setInstanceFollowRedirects(false);
-		connection.setRequestProperty("Content-Type",
-				"application/x-www-form-urlencoded");
-		connection.connect();
-		OutputStream out = connection.getOutputStream();
-		handler.write(out);
-		out.flush();
-		out.close();
+	// ////////////////////////////////////////////////////////////////////
+	// stream mode
 
-		if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+	public static InputStream getStream(String urlStr) throws HttpException {
+		URL url = null;
+		try {
+			url = new URL(urlStr);
+
+			HttpURLConnection connection = (HttpURLConnection) url
+					.openConnection();
+
 			InputStream is = connection.getInputStream();
-			handler.read(is);
-			is.close();
-		} else {
-			handler.call(false, connection.getResponseCode());
+			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+				return is;
+			} else {
+				String s = streamToString(is);
+				is.close();
+				throw new HttpException(connection.getResponseCode(), s);
+			}
+		} catch (IOException e) {
+			throw new HttpException(-1, e);
 		}
 	}
 
 	public static InputStream postStream(String urlStr, InputStream in)
-			throws IOException {
-		URL url = new URL(urlStr);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+			throws HttpException {
+		URL url = null;
+		try {
+			url = new URL(urlStr);
+			HttpURLConnection connection = (HttpURLConnection) url
+					.openConnection();
 
-		connection.setDoInput(true);
-		connection.setDoOutput(true);
-		connection.setRequestMethod("POST");
-		connection.setUseCaches(false);
-		connection.setInstanceFollowRedirects(false);
-		connection.setRequestProperty("Content-Type",
-				"application/x-www-form-urlencoded");
-		connection.connect();
-		OutputStream out = connection.getOutputStream();
-		StreamUtil.pipe(in, out);
-		out.close();
+			connection.setDoInput(true);
+			connection.setDoOutput(true);
+			connection.setRequestMethod("POST");
+			connection.setUseCaches(false);
+			connection.setInstanceFollowRedirects(false);
+			connection.setRequestProperty("Content-Type",
+					"application/x-www-form-urlencoded");
+			connection.connect();
+			OutputStream out = connection.getOutputStream();
+			StreamUtil.pipe(in, out);
+			out.close();
 
-		if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+				String s = null;
+				try {
+					InputStream is = connection.getInputStream();
+					s = streamToString(is);
+					is.close();
+				} catch (Exception e) {
+				}
+				throw new HttpException(connection.getResponseCode(), s);
+			}
+
 			InputStream is = connection.getInputStream();
 			return is;
-		} else {
-			System.err.print("response code: " + connection.getResponseCode());
-			return null;
+		} catch (IOException e) {
+			throw new HttpException(-1, e);
+		}
+	}
+
+	// ////////////////////////////////////////////////////////////////////
+	// callback mode
+
+	public static void doRequest(String urlStr, String method,
+			HttpHandler handler) {
+		URL url = null;
+		try {
+			url = new URL(urlStr);
+			HttpURLConnection connection = (HttpURLConnection) url
+					.openConnection();
+
+			if (!"GET".equalsIgnoreCase(method)) {
+				connection.setDoInput(true);
+				connection.setDoOutput(true);
+				connection.setRequestMethod("POST");
+				connection.setUseCaches(false);
+				connection.setInstanceFollowRedirects(false);
+				connection.setRequestProperty("Content-Type",
+						"application/x-www-form-urlencoded");
+				connection.connect();
+				OutputStream out = connection.getOutputStream();
+
+				try {
+					handler.write(out);
+					out.flush();
+				} finally {
+					out.close();
+				}
+			}
+
+			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+				String s = null;
+				try {
+					InputStream is = connection.getInputStream();
+					s = streamToString(is);
+					is.close();
+				} catch (Exception e) {
+				}
+				handler.onError(connection.getResponseCode(), s);
+			} else {
+				InputStream is = connection.getInputStream();
+				try {
+					handler.read(is);
+				} finally {
+					is.close();
+				}
+			}
+		} catch (IOException e) {
+			handler.onError(-1, e);
+			e.printStackTrace();
 		}
 	}
 }
