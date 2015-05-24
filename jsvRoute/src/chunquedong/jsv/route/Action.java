@@ -48,4 +48,12 @@ public interface Action {
 		static public @interface Delete {
 		public String name = "DELETE";
 	}
+	
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.METHOD})
+	@Inherited
+	@Documented
+	static public @interface Cache {
+		public long expiry() default 300;
+	}
 }

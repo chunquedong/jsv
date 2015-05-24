@@ -62,10 +62,10 @@ public abstract class Controller {
 				response.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
 				return;
 			}
-
+			
 			this.request = request;
 			this.response = response;
-
+			
 			if (autoSetContentType) {
 				setContentType();
 			}
@@ -78,7 +78,7 @@ public abstract class Controller {
 		}
 	}
 
-	private void invoke(Method method, String param) throws IOException {
+	protected void invoke(Method method, String param) throws IOException {
 		int paramSize = method.getParameterTypes().length;
 		try {
 			Object ret;
@@ -100,12 +100,12 @@ public abstract class Controller {
 				response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 				return;
 			}
-			
-			//send result
+
+			// send result
 			if (ret != null) {
 				response.getWriter().print(ret);
 			}
-			
+
 		} catch (IllegalArgumentException e) {
 			onError(e);
 		} catch (IllegalAccessException e) {
@@ -252,14 +252,14 @@ public abstract class Controller {
 			return defaultValue;
 		return s;
 	}
-	
+
 	protected boolean getBoolean(String name, boolean defaultValue) {
 		String s = request.getParameter(name);
 		if (s == null)
 			return defaultValue;
 		return "true".equals(s);
 	}
-	
+
 	protected boolean isPresent(String name) {
 		return request.getParameter(name) != null;
 	}
