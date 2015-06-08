@@ -12,7 +12,7 @@ import chunquedong.jsv.cache.Cache;
 import chunquedong.jsv.cache.LruCache;
 
 public class CachedController extends Controller {
-	protected Cache cache = new LruCache();
+	protected static Cache cache = new LruCache();
 
 	public Cache getCache() {
 		return cache;
@@ -50,6 +50,7 @@ public class CachedController extends Controller {
 	class ResponseWrapper extends HttpServletResponseWrapper {
 
 		ServletOutStream out = new ServletOutStream();
+		private PrintWriter writer = null;
 
 		public ResponseWrapper(HttpServletResponse response) {
 			super(response);
@@ -57,18 +58,33 @@ public class CachedController extends Controller {
 
 		@Override
 		public PrintWriter getWriter() throws IOException {
-			PrintWriter writer = new PrintWriter(out);
+			if (writer == null) {
+				writer = new PrintWriter(out);
+			}
 			return writer;
 		}
 
 		@Override
 		public ServletOutputStream getOutputStream() throws java.io.IOException {
-			ServletOutStream out = new ServletOutStream();
 			return out;
 		}
 
-		public void flush() throws IOException {
-			super.getOutputStream().write(out.outStream.toByteArray());
+		public byte[] flushAndGet() throws IOException {
+			if (writer != null) {
+				writer.flush();
+			} else {
+				out.flush();
+			}
+			
+			byte[] result = out.outStream.toByteArray();
+			super.getOutputStream().write(result);
+			
+			if (writer != null) {
+				writer.close();
+			} else {
+				out.close();
+			}
+			return result;
 		}
 	}
 
@@ -81,23 +97,28 @@ public class CachedController extends Controller {
 		if (cache != null) {
 			item = needCache(method, request.getMethod(),
 					request.getRequestURI());
-			Object obj = cache.get(item.key);
-			if (obj != null) {
-				response.addHeader("IS_CACHE", "true");
-				this.response.getOutputStream().write((byte[]) obj);
-				return;
-			}
-			
 			if (item != null) {
-				res = new ResponseWrapper(this.response);
-				this.response = res;
+				//try get from cache
+				Object obj = cache.get(item.key);
+				if (obj != null) {
+					response.addHeader("IS_CACHE", "true");
+					this.response.getOutputStream().write((byte[]) obj);
+					return;
+				}
+				
+				//do wrap
+				if (item != null) {
+					res = new ResponseWrapper(this.response);
+					this.response = res;
+				}
 			}
 		}
 
 		super.invoke(method, param);
 
+		//add to cache
 		if (res != null) {
-			cache.put(item.key, res.out.outStream.toByteArray(), item.expiry);
+			cache.put(item.key, res.flushAndGet(), item.expiry);
 		}
 	}
 

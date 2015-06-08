@@ -45,7 +45,7 @@ public interface Action {
 	@Target({ElementType.METHOD})
 	@Inherited
 	@Documented
-		static public @interface Delete {
+	static public @interface Delete {
 		public String name = "DELETE";
 	}
 	
@@ -54,6 +54,7 @@ public interface Action {
 	@Inherited
 	@Documented
 	static public @interface Cache {
+		//time of seconds
 		public long expiry() default 300;
 	}
 }

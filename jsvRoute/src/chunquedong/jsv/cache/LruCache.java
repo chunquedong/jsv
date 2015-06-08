@@ -26,7 +26,11 @@ public class LruCache extends LinkedHashMap<String, Cache.CacheItem> implements
 	@Override
 	public synchronized Object get(String key) {
 		Cache.CacheItem obj = super.get(key);
-		if (obj.time + (obj.expiry*1000) > System.currentTimeMillis()) {
+		if (obj == null) {
+			return null;
+		}
+		
+		if (obj.time + (obj.expiry*1000) < System.currentTimeMillis()) {
 			remove(key);
 			return null;
 		}

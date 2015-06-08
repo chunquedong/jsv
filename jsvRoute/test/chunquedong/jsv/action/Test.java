@@ -8,7 +8,6 @@ import chunquedong.jsv.route.Controller;
 
 public class Test extends Controller {
 
-	@Action.Cache
 	public void get(long id) throws IOException {
 		response.getWriter().println("get:"+id);
 	}
@@ -33,5 +32,9 @@ public class Test extends Controller {
 	
 	void foo3() throws IOException {
 		response.getWriter().println("foo1:");
+	}
+	
+	public void form() {
+		this.render();
 	}
 }
