@@ -4,6 +4,7 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Connection;
 import java.util.Properties;
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Level;
@@ -12,12 +13,13 @@ import java.util.logging.Logger;
 import chunquedong.jsv.record.connect.ConnectionPool;
 import chunquedong.jsv.record.model.Schema;
 import chunquedong.jsv.record.sql.dialect.H2Dialect;
+import chunquedong.jsv.record.sql.dialect.SqlDialect;
 
 public class ConnectionFactory {
 	static Logger log = Logger.getLogger("jsvRecord");
 	private ConnectionPool connectionPool;
-	private Context context;
-	private static ConnectionFactory instance = new ConnectionFactory();
+	private SqlDialect dialet = null;
+	private ThreadLocal<Context> context = new ThreadLocal<Context>();
 
 	static {
 		ConsoleHandler handler = new ConsoleHandler();
@@ -26,24 +28,15 @@ public class ConnectionFactory {
 		log.setLevel(Level.ALL);
 	}
 
-	public static ConnectionFactory getInstance() {
-		return instance;
-	}
-
-	public Context getContext() {
-		return context;
-	}
-
 	public void init(String driver, String url, String userName, String passWord,
 	    int poolSize, String level) {
 		Level l = Level.parse(level);
 		log.setLevel(l);
 		connectionPool = new ConnectionPool(driver, url, userName, passWord,
 		    poolSize);
-		context = new Context();
 		
 		if ("org.h2.Driver".equals(driver)) {
-			context.setDialect(new H2Dialect());
+			dialet = (new H2Dialect());
 		}
 	}
 
@@ -54,7 +47,7 @@ public class ConnectionFactory {
 			String userName = "postgres";
 			String passWord = "111";
 			
-			ConnectionFactory.getInstance().init(driver, url, userName, passWord, 20, "ALL");
+			this.init(driver, url, userName, passWord, 20, "ALL");
 			return;
 		}
 		
@@ -86,22 +79,41 @@ public class ConnectionFactory {
 	}
 
 	public void closeAll() {
+		context = new ThreadLocal<Context>();
 		connectionPool.closeAll();
 	}
 
-	public boolean open() {
-		try {
-			Context.setConnection(connectionPool.open());
-			return true;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
+	public Context getContext() {
+		Context cx = context.get();
+		if (cx == null) {
+			try {
+				cx = new Context();
+				cx.setConnection(connectionPool.open());
+				if (dialet != null) {
+					cx.setDialect(dialet);
+				}
+				context.set(cx);
+			} catch (Exception e) {
+				e.printStackTrace();
+				return null;
+			}
 		}
+		return cx;
 	}
 
-	public void close() {
-		connectionPool.close(context.getConnection());
-		Context.setConnection(null);
+	public boolean close() {
+		Context cx = context.get();
+		if (cx == null) {
+			return false;
+		}
+		
+		Connection conn = cx.getConnection();
+		if (conn != null) {
+			connectionPool.close(conn);
+			cx.setConnection(null);
+		}
+		context.set(null);
+		return true;
 	}
 
 	public void createTable(Schema table, boolean drop) {

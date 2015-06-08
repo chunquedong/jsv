@@ -20,18 +20,15 @@ import chunquedong.jsv.record.sql.SqlExecutor;
 import chunquedong.jsv.record.sql.dialect.SqlDialect;
 
 public class Context {
-	private static ThreadLocal<Connection> connection = new ThreadLocal<Connection>();
+	private Connection connection;
 	private SqlExecutor executor = new SqlExecutor();
 	
 	public Connection getConnection() {
-		if (connection.get() != null) {
-			return connection.get();
-		}
-		throw new RuntimeException("no found connection");
+		return connection;
 	}
 	
-	public static void setConnection(Connection conn) {
-		connection.set(conn);
+	public void setConnection(Connection conn) {
+		connection = (conn);
 	}
 	
 	public SqlDialect getDialect() {

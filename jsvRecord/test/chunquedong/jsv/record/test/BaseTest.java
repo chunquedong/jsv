@@ -14,6 +14,7 @@ import chunquedong.jsv.record.model.Schema;
 
 public class BaseTest {
 	Schema table;
+	static ConnectionFactory connetion = new ConnectionFactory();
 
 	@Before
 	public void setup()
@@ -26,18 +27,17 @@ public class BaseTest {
 		String userName = "postgres";
 		String passWord = "111";
 		
-		ConnectionFactory.getInstance().init(driver, url, userName, passWord, 20, "ALL");
-		ConnectionFactory.getInstance().open();
+		connetion.init(driver, url, userName, passWord, 20, "ALL");
 	}
 	
 	Context cx() {
-		return ConnectionFactory.getInstance().getContext();
+		return connetion.getContext();
 	}
 
 	@After
 	public void teardown()
 	{
-		ConnectionFactory.getInstance().closeAll();
+		connetion.closeAll();
 	}
 	
 	private void buildTable()

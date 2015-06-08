@@ -32,7 +32,7 @@ public class ConnectionPool {
 		list = new ArrayBlockingQueue<Connection>(capacity);
 	}
 	
-	public Connection open() {
+	public synchronized Connection open() {
 		while (list.size() > 0) {
 			try {
 				Connection conn = list.poll();
@@ -57,7 +57,7 @@ public class ConnectionPool {
 		return DbUtil.getConnection(driver, url, userName, passWord);
 	}
 	
-	public void close(Connection conn) {
+	public synchronized void close(Connection conn) {
 		try {
 			if (conn.isClosed()) {
 				return;
