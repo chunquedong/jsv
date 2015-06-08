@@ -13,7 +13,9 @@ import java.util.logging.Logger;
 import chunquedong.jsv.record.connect.ConnectionPool;
 import chunquedong.jsv.record.model.Schema;
 import chunquedong.jsv.record.sql.dialect.H2Dialect;
+import chunquedong.jsv.record.sql.dialect.MySqlDialect;
 import chunquedong.jsv.record.sql.dialect.SqlDialect;
+import chunquedong.jsv.record.sql.dialect.SqliteDialect;
 
 public class ConnectionFactory {
 	static Logger log = Logger.getLogger("jsvRecord");
@@ -36,7 +38,13 @@ public class ConnectionFactory {
 		    poolSize);
 		
 		if ("org.h2.Driver".equals(driver)) {
-			dialet = (new H2Dialect());
+			dialet = new H2Dialect();
+		}
+		else if ("com.mysql.jdbc.Driver".equals(driver)) {
+			dialet = new MySqlDialect();
+		}
+		else if ("org.sqlite.JDBC".equals(driver)) {
+			dialet = new SqliteDialect();
 		}
 	}
 

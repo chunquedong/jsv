@@ -18,7 +18,7 @@ public class SqlDialect {
 	}
 
 	public String autoIncrement() {
-		return "autoincrement";
+		return "auto_increment";
 	}
 	
 	public static String escaptSqlWord(String w) {
