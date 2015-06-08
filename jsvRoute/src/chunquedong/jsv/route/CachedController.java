@@ -95,8 +95,7 @@ public class CachedController extends Controller {
 		ResponseWrapper res = null;
 		Cache.CacheItem item = null;
 		if (cache != null) {
-			item = needCache(method, request.getMethod(),
-					request.getRequestURI());
+			item = needCache(method, request.getMethod());
 			if (item != null) {
 				//try get from cache
 				Object obj = cache.get(item.key);
@@ -122,11 +121,18 @@ public class CachedController extends Controller {
 		}
 	}
 
-	private Cache.CacheItem needCache(Method method, String name, String url) {
+	private Cache.CacheItem needCache(Method method, String name) {
 		if (name.equals("GET")) {
 			if (method.isAnnotationPresent(Action.Cache.class)) {
 				Cache.CacheItem item = new Cache.CacheItem();
-				item.key = url;
+				
+				//URI is a part of URL
+				String reqUrl = request.getRequestURI();
+				String queryString = request.getQueryString();
+			    if (queryString != null) {
+			        reqUrl += "?"+queryString;
+			    }
+				item.key = reqUrl;
 				item.expiry = method.getAnnotation(Action.Cache.class).expiry();
 				return item;
 			}
