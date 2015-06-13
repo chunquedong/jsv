@@ -21,17 +21,21 @@ import javax.imageio.ImageIO;
 
 public class Patchca {
 	// image size
-	public int width = 120;
+	public int width = 100;
 	public int height = 25;
 
 	// char num
-	public int n = 5;
+	public int n = 4;
 
 	public int margin = 5;
 	public int charPad = 15;
 	public int noise = 3;
 
 	public int fontSize = 24;
+	
+	public Font font = null;
+	
+	public String charSet = "abcdefghijkmnopqrstuvwxyz0123456789";
 
 	/**
 	 ** output the image to stream, and return the generate code
@@ -68,13 +72,18 @@ public class Patchca {
 	}
 
 	private void drawCode(char c, Graphics2D g, int i) {
-		g.setFont(new Font("Arial", Font.BOLD | (Font.ITALIC), fontSize));
+		if (font != null) {
+			Font f = font.deriveFont(Font.BOLD | (Font.ITALIC), fontSize);
+			g.setFont(f);
+		} else {
+			g.setFont(new Font(Font.MONOSPACED, Font.BOLD | (Font.ITALIC), fontSize));
+		}
 		g.drawString(new String(new char[] { c }), left(i), base());
 	}
 
 	// get random code
 	public String randomCode() {
-		String list = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+		String list = charSet;
 		char[] code = new char[n];
 		for (int i = 0; i < n; ++i) {
 			int random = (int) (Math.random() * list.length());

@@ -167,18 +167,27 @@ public abstract class Controller {
 
 	protected void after() {
 	}
+	
+	public static String getUrl(HttpServletRequest req) {
+	    String reqUrl = req.getRequestURL().toString();
+	    String queryString = req.getQueryString();
+	    if (queryString != null) {
+	        reqUrl += "?"+queryString;
+	    }
+	    return reqUrl;
+	}
 
 	protected void onError(Throwable e) {
+		System.err.println("request error:" + getUrl(request) + ", cause:"+ e.getMessage());
 		try {
 			if (RouteServlet.isDebug()) {
+				e.printStackTrace();
 				e.printStackTrace(response.getWriter());
 				sendError();
-				e.printStackTrace();
 			} else {
 				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 			}
 		} catch (IOException e1) {
-			e1.printStackTrace();
 		}
 	}
 
