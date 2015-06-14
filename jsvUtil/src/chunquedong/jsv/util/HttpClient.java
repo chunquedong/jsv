@@ -83,19 +83,29 @@ public class HttpClient {
 		}
 		return null;
 	}
-
+	
 	public static void addCookie(String uri, String name, String value) {
+		addCookie(uri, name, value, "/");
+	}
+
+	public static void addCookie(String uri, String name, String value, String path) {
 		CookieManager cookieManager = (CookieManager) CookieHandler
 				.getDefault();
 		try {
 			URI u = new URI(uri);
 			HttpCookie c = new HttpCookie(name, value);
-			c.setPath("/");
+			c.setPath(path);
 			c.setDomain(u.getHost());
 			cookieManager.getCookieStore().add(new URI(uri), c);
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public static void clearCookie() {
+		CookieManager cookieManager = (CookieManager) CookieHandler
+				.getDefault();
+		cookieManager.getCookieStore().removeAll();
 	}
 
 	// ////////////////////////////////////////////////////////////////////
