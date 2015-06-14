@@ -53,6 +53,14 @@ public interface Action {
 	@Target({ElementType.METHOD})
 	@Inherited
 	@Documented
+	static public @interface Forbid {
+		public String name = "FORBID";
+	}
+	
+	@Retention(RetentionPolicy.RUNTIME)
+	@Target({ElementType.METHOD})
+	@Inherited
+	@Documented
 	static public @interface Cache {
 		//time of seconds
 		public long expiry() default 300;

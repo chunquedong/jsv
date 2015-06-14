@@ -120,18 +120,33 @@ public class CachedController extends Controller {
 			cache.put(item.key, res.flushAndGet(), item.expiry);
 		}
 	}
+	
+	protected String cacheKey() {
+		String reqUrl;
+		Object obj = request.getAttribute("RequestURI");
+		if (obj != null) {
+			reqUrl = obj.toString();
+		} else {
+			//URI is a part of URL
+			reqUrl = request.getRequestURI();
+		}
+		
+		String queryString = request.getQueryString();
+	    if (queryString != null) {
+	        reqUrl += "?"+queryString;
+	    }
+	    return reqUrl;
+	}
 
 	private Cache.CacheItem needCache(Method method, String name) {
 		if (name.equals("GET")) {
 			if (method.isAnnotationPresent(Action.Cache.class)) {
-				Cache.CacheItem item = new Cache.CacheItem();
+				String reqUrl = cacheKey();
+				if (reqUrl == null) {
+					return null;
+				}
 				
-				//URI is a part of URL
-				String reqUrl = request.getRequestURI();
-				String queryString = request.getQueryString();
-			    if (queryString != null) {
-			        reqUrl += "?"+queryString;
-			    }
+				Cache.CacheItem item = new Cache.CacheItem();
 				item.key = reqUrl;
 				item.expiry = method.getAnnotation(Action.Cache.class).expiry();
 				return item;

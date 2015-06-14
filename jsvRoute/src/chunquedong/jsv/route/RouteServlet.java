@@ -72,6 +72,7 @@ public class RouteServlet extends HttpServlet {
 		String path = request.getRequestURI();
 		if (profix != null && path.startsWith(profix)) {
 			path = path.substring(profix.length());
+			request.setAttribute("RequestURI", path);
 		}
 
 		String className = "Index";

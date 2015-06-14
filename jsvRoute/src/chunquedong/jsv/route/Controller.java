@@ -133,6 +133,11 @@ public abstract class Controller {
 		if ((method.getModifiers() & Modifier.PUBLIC) == 0) {
 			return false;
 		}
+		
+		if (method.isAnnotationPresent(Action.Forbid.class)) {
+			return false;
+		}
+		
 		if (name.equals("GET")) {
 			if (method.isAnnotationPresent(Action.Post.class)
 					|| method.isAnnotationPresent(Action.Put.class)
