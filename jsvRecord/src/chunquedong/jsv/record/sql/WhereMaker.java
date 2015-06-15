@@ -13,7 +13,7 @@ import chunquedong.jsv.record.model.Schema;
 
 public class WhereMaker {
 	public static void getSql(StringBuilder sql, Schema table, Object obj) {
-		sql.append(" from ").append(table.getName()).append(" where ");
+		sql.append(" from ").append(table.getName());
 
 		boolean isFirst = true;
 		for (int i=0,n=table.size(); i<n; ++i) {
@@ -22,6 +22,8 @@ public class WhereMaker {
 			if (val != null) {
 				if (!isFirst) {
 					sql.append(" and ");
+				} else {
+					sql.append(" where ");
 				}
 				sql.append(f.getName()+"=?");
 				isFirst = false;
