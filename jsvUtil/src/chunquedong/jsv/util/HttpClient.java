@@ -15,8 +15,10 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 
 public class HttpClient {
+	public static Map<String,String> headers;
 
 	public static interface HttpHandler {
 		void write(OutputStream out) throws IOException;
@@ -178,6 +180,16 @@ public class HttpClient {
 		}
 		return handler.response;
 	}
+	
+	private static void applyHeaders(HttpURLConnection connection) {
+		if (headers == null) {
+			return;
+		}
+		
+		for (Map.Entry<String, String> entry : headers.entrySet()) {
+			connection.setRequestProperty(entry.getKey(), entry.getValue());
+		}
+	}
 
 	// ////////////////////////////////////////////////////////////////////
 	// stream mode
@@ -189,7 +201,7 @@ public class HttpClient {
 
 			HttpURLConnection connection = (HttpURLConnection) url
 					.openConnection();
-
+			applyHeaders(connection);
 			InputStream is = connection.getInputStream();
 			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
 				return is;
@@ -210,7 +222,7 @@ public class HttpClient {
 			url = new URL(urlStr);
 			HttpURLConnection connection = (HttpURLConnection) url
 					.openConnection();
-
+			applyHeaders(connection);
 			connection.setDoInput(true);
 			connection.setDoOutput(true);
 			connection.setRequestMethod("POST");
@@ -251,7 +263,7 @@ public class HttpClient {
 			url = new URL(urlStr);
 			HttpURLConnection connection = (HttpURLConnection) url
 					.openConnection();
-
+			applyHeaders(connection);
 			if (!"GET".equalsIgnoreCase(method)) {
 				connection.setDoInput(true);
 				connection.setDoOutput(true);
