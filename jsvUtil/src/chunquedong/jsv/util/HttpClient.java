@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 public class HttpClient {
-	public static Map<String,String> headers;
+	public Map<String, String> headers;
+	public int timeout = 10000;
+	public boolean disconnect = true;
 
 	public static interface HttpHandler {
 		void write(OutputStream out) throws IOException;
@@ -64,12 +66,12 @@ public class HttpClient {
 	// ////////////////////////////////////////////////////////////////////
 	// cookie
 
-	public static void initCookie() {
+	public void initCookie() {
 		CookieManager cookieManager = new CookieManager();
 		CookieHandler.setDefault(cookieManager);
 	}
 
-	public static String getCookie(String uri, String name) {
+	public String getCookie(String uri, String name) {
 		CookieManager cookieManager = (CookieManager) CookieHandler
 				.getDefault();
 		try {
@@ -85,12 +87,12 @@ public class HttpClient {
 		}
 		return null;
 	}
-	
-	public static void addCookie(String uri, String name, String value) {
+
+	public void addCookie(String uri, String name, String value) {
 		addCookie(uri, name, value, "/");
 	}
 
-	public static void addCookie(String uri, String name, String value, String path) {
+	public void addCookie(String uri, String name, String value, String path) {
 		CookieManager cookieManager = (CookieManager) CookieHandler
 				.getDefault();
 		try {
@@ -103,8 +105,8 @@ public class HttpClient {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void clearCookie() {
+
+	public void clearCookie() {
 		CookieManager cookieManager = (CookieManager) CookieHandler
 				.getDefault();
 		cookieManager.getCookieStore().removeAll();
@@ -160,7 +162,7 @@ public class HttpClient {
 		}
 	};
 
-	public static String get(String urlStr) throws HttpException {
+	public String get(String urlStr) throws HttpException {
 		StringHttpHandler handler = new StringHttpHandler();
 		handler.request = null;
 		doRequest(urlStr, "GET", handler);
@@ -170,8 +172,7 @@ public class HttpClient {
 		return handler.response;
 	}
 
-	public static String post(String urlStr, String content)
-			throws HttpException {
+	public String post(String urlStr, String content) throws HttpException {
 		StringHttpHandler handler = new StringHttpHandler();
 		handler.request = content;
 		doRequest(urlStr, "POST", handler);
@@ -180,91 +181,58 @@ public class HttpClient {
 		}
 		return handler.response;
 	}
-	
-	private static void applyHeaders(HttpURLConnection connection) {
-		if (headers == null) {
-			return;
-		}
-		
-		for (Map.Entry<String, String> entry : headers.entrySet()) {
-			connection.setRequestProperty(entry.getKey(), entry.getValue());
+
+	private void setConnection(HttpURLConnection connection) {
+		connection.setConnectTimeout(timeout);
+		connection.setReadTimeout(timeout);
+
+		if (headers != null) {
+			for (Map.Entry<String, String> entry : headers.entrySet()) {
+				connection.setRequestProperty(entry.getKey(), entry.getValue());
+			}
 		}
 	}
 
 	// ////////////////////////////////////////////////////////////////////
 	// stream mode
 
-	public static InputStream getStream(String urlStr) throws HttpException {
+	public InputStream getStream(String urlStr) throws HttpException {
 		URL url = null;
 		try {
 			url = new URL(urlStr);
 
-			HttpURLConnection connection = (HttpURLConnection) url
-					.openConnection();
-			applyHeaders(connection);
-			InputStream is = connection.getInputStream();
-			if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
-				return is;
-			} else {
-				String s = streamToString(is);
-				is.close();
-				throw new HttpException(connection.getResponseCode(), s);
+			HttpURLConnection connection = null;
+			try {
+				connection = (HttpURLConnection) url.openConnection();
+				setConnection(connection);
+				InputStream is = connection.getInputStream();
+				if (connection.getResponseCode() == HttpURLConnection.HTTP_OK) {
+					return is;
+				} else {
+					String s = streamToString(is);
+					is.close();
+					throw new HttpException(connection.getResponseCode(), s);
+				}
+			} finally {
+				if (connection != null && disconnect) {
+					connection.disconnect();
+				}
 			}
 		} catch (IOException e) {
 			throw new HttpException(-1, e);
 		}
 	}
 
-	public static InputStream postStream(String urlStr, InputStream in)
+	public InputStream postStream(String urlStr, InputStream in)
 			throws HttpException {
 		URL url = null;
 		try {
 			url = new URL(urlStr);
-			HttpURLConnection connection = (HttpURLConnection) url
-					.openConnection();
-			applyHeaders(connection);
-			connection.setDoInput(true);
-			connection.setDoOutput(true);
-			connection.setRequestMethod("POST");
-			connection.setUseCaches(false);
-			connection.setInstanceFollowRedirects(false);
-			connection.setRequestProperty("Content-Type",
-					"application/x-www-form-urlencoded");
-			connection.connect();
-			OutputStream out = connection.getOutputStream();
-			StreamUtil.pipe(in, out);
-			out.close();
 
-			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-				String s = null;
-				try {
-					InputStream is = connection.getInputStream();
-					s = streamToString(is);
-					is.close();
-				} catch (Exception e) {
-				}
-				throw new HttpException(connection.getResponseCode(), s);
-			}
-
-			InputStream is = connection.getInputStream();
-			return is;
-		} catch (IOException e) {
-			throw new HttpException(-1, e);
-		}
-	}
-
-	// ////////////////////////////////////////////////////////////////////
-	// callback mode
-
-	public static void doRequest(String urlStr, String method,
-			HttpHandler handler) {
-		URL url = null;
-		try {
-			url = new URL(urlStr);
-			HttpURLConnection connection = (HttpURLConnection) url
-					.openConnection();
-			applyHeaders(connection);
-			if (!"GET".equalsIgnoreCase(method)) {
+			HttpURLConnection connection = null;
+			try {
+				connection = (HttpURLConnection) url.openConnection();
+				setConnection(connection);
 				connection.setDoInput(true);
 				connection.setDoOutput(true);
 				connection.setRequestMethod("POST");
@@ -274,30 +242,83 @@ public class HttpClient {
 						"application/x-www-form-urlencoded");
 				connection.connect();
 				OutputStream out = connection.getOutputStream();
+				StreamUtil.pipe(in, out);
+				out.close();
 
-				try {
-					handler.write(out);
-					out.flush();
-				} finally {
-					out.close();
+				if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+					String s = null;
+					try {
+						InputStream is = connection.getInputStream();
+						s = streamToString(is);
+						is.close();
+					} catch (Exception e) {
+					}
+					throw new HttpException(connection.getResponseCode(), s);
+				}
+
+				InputStream is = connection.getInputStream();
+				return is;
+			} finally {
+				if (connection != null && disconnect) {
+					connection.disconnect();
 				}
 			}
+		} catch (IOException e) {
+			throw new HttpException(-1, e);
+		}
+	}
 
-			if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
-				String s = null;
-				try {
-					InputStream is = connection.getInputStream();
-					s = streamToString(is);
-					is.close();
-				} catch (Exception e) {
+	// ////////////////////////////////////////////////////////////////////
+	// callback mode
+
+	public void doRequest(String urlStr, String method, HttpHandler handler) {
+		URL url = null;
+		try {
+			url = new URL(urlStr);
+
+			HttpURLConnection connection = null;
+			try {
+				connection = (HttpURLConnection) url.openConnection();
+				setConnection(connection);
+				if (!"GET".equalsIgnoreCase(method)) {
+					connection.setDoInput(true);
+					connection.setDoOutput(true);
+					connection.setRequestMethod("POST");
+					connection.setUseCaches(false);
+					connection.setInstanceFollowRedirects(false);
+					connection.setRequestProperty("Content-Type",
+							"application/x-www-form-urlencoded");
+					connection.connect();
+					OutputStream out = connection.getOutputStream();
+
+					try {
+						handler.write(out);
+						out.flush();
+					} finally {
+						out.close();
+					}
 				}
-				handler.onError(connection.getResponseCode(), s);
-			} else {
-				InputStream is = connection.getInputStream();
-				try {
-					handler.read(is);
-				} finally {
-					is.close();
+
+				if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+					String s = null;
+					try {
+						InputStream is = connection.getInputStream();
+						s = streamToString(is);
+						is.close();
+					} catch (Exception e) {
+					}
+					handler.onError(connection.getResponseCode(), s);
+				} else {
+					InputStream is = connection.getInputStream();
+					try {
+						handler.read(is);
+					} finally {
+						is.close();
+					}
+				}
+			} finally {
+				if (connection != null && disconnect) {
+					connection.disconnect();
 				}
 			}
 		} catch (IOException e) {
