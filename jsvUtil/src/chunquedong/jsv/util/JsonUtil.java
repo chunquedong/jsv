@@ -8,6 +8,7 @@
 
 package chunquedong.jsv.util;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import chunquedong.jsv.record.model.DataType;
@@ -53,6 +54,45 @@ public class JsonUtil {
 			} else {
 				String val = quote(r.get(i).toString());
 				sb.append(val);
+			}
+		}
+		
+		Class<?> clz = r.getClass();
+		java.lang.reflect.Field[] fs = clz.getDeclaredFields();
+		for (java.lang.reflect.Field f : fs) {
+			if ((f.getModifiers() & Modifier.STATIC) != 0) continue;
+			if ((f.getModifiers() & Modifier.TRANSIENT) != 0) continue;
+			if ((f.getModifiers() & Modifier.PRIVATE) != 0) continue;
+			if (Record.class.isAssignableFrom(f.getType())) {
+				try {
+					Record v = (Record)(f.get(r));
+					if (v == null) continue;
+					sb.append(",\"").append(f.getName()).append("\":");
+					toJson(v, sb);
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
+			}
+			else if (List.class.isAssignableFrom(f.getType())) {
+				try {
+					List<?> list = (List<?>)(f.get(r));
+					if (list == null) continue;
+					sb.append(",\"").append(f.getName()).append("\":");
+					sb.append("[\n");
+					for (Object o : list) {
+						if (o instanceof Record) {
+							toJson((Record)(o), sb);
+							sb.append(",\n");
+						}
+					}
+					sb.append("]");
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		sb.append("}");

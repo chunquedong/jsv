@@ -27,16 +27,21 @@ public class JsvServer {
 	private String viewPath;
 	
 	public JsvServer() {
-		java.net.URL url = this.getClass().getResource("/");
-		String classLoadPath = url.getPath();
-		String appPath = getParentPath(classLoadPath);
-		appPath = getParentPath(appPath);
-		appPath = getParentPath(appPath);
-		System.out.println("appPath:" + appPath);
-		
-		classPath = appPath + "/WEB-INF/classes";
-		resourceBase = appPath;
-		viewPath = appPath + "/WEB-INF";
+		try {
+			java.net.URL url = this.getClass().getResource("/");
+			if (url != null) {
+				String classLoadPath = url.getPath();
+				String appPath = getParentPath(classLoadPath);
+				appPath = getParentPath(appPath);
+				appPath = getParentPath(appPath);
+				System.out.println("appPath:" + appPath);
+				
+				classPath = appPath + "/WEB-INF/classes";
+				resourceBase = appPath;
+				viewPath = appPath + "/WEB-INF";
+			}
+		} catch (Throwable ex) {
+		}
 	}
 	
 	public static String getParentPath(String path) {

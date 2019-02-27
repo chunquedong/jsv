@@ -205,7 +205,7 @@ public abstract class Controller {
 		if (extName.equals(".vm")) {
 			setContentType("text/html; charset=utf-8");
 		} else {
-			setContentType("text/" + extName + "; charset=utf-8");
+			setContentType("text/" + extName.substring(1) + "; charset=utf-8");
 		}
 	}
 
