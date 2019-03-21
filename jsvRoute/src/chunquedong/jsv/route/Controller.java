@@ -188,9 +188,9 @@ public abstract class Controller {
 			if (RouteServlet.isDebug()) {
 				e.printStackTrace();
 				e.printStackTrace(response.getWriter());
-				sendError();
+				sendError(e.getMessage());
 			} else {
-				response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				sendError(e.getMessage());
 			}
 		} catch (IOException e1) {
 		}
@@ -227,18 +227,22 @@ public abstract class Controller {
 			e.printStackTrace();
 		}
 	}
-
+	
 	protected void sendOk() {
-		try {
-			response.sendError(HttpServletResponse.SC_OK);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		sendOk("true");
 	}
 
+	protected void sendOk(String msg) {
+		sendText(msg);
+	}
+	
 	protected void sendError() {
+		sendError("false");
+	}
+
+	protected void sendError(String msg) {
 		try {
-			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, msg);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
