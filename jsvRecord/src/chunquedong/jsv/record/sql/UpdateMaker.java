@@ -8,11 +8,14 @@
 
 package chunquedong.jsv.record.sql;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import chunquedong.jsv.record.model.Field;
 import chunquedong.jsv.record.model.Schema;
 
 public class UpdateMaker {
-	public static void getSql(StringBuilder sql, Schema table) {
+	public static void getSql(StringBuilder sql, Schema table, Object obj) {
 		sql.append("update ").append(table.getName()).append(" set ");
 
 		for (int i=0,n=table.size(); i<n; ++i) {
@@ -20,6 +23,9 @@ public class UpdateMaker {
 				//jump
 			} else {
 				Field f = table.get(i);
+				Object value = f.getValue(obj);
+				if (value == null) continue;
+				
 				sql.append(f.getName()+"=?,");
 			}
 		}
@@ -32,17 +38,21 @@ public class UpdateMaker {
 	{
 		int size = table.size();
 		int count = 0;
-		Object[] param = new Object[size];
+		List<Object> param = new ArrayList<Object>();
 		for (int i=0,n=table.size(); i<n; ++i) {
 			if (table.getPk().getIndex() == i) {
 				//jump
 			} else {
 				Field f = table.get(i);
-				param[count] = f.getValue(obj);
+				Object value = f.getValue(obj);
+				if (value == null) continue;
+				
+				param.add(value);
 				++count;
 			}
 		}
-		param[count] = table.getPk().getValue(obj);
-		return param;
+		Object id = table.getPk().getValue(obj);
+		param.add(id);
+		return param.toArray();
 	}
 }
