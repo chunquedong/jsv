@@ -12,6 +12,7 @@ import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 import chunquedong.jsv.record.connect.DbUtil;
@@ -124,6 +125,49 @@ public class Context {
 	{
 		return this.executor.selectWhere(table, this.getConnection(), condition
 				, params, offset, limit);
+	}
+	
+	public List<Record> query(String sql, Object[] params) {
+		try {
+			java.sql.PreparedStatement stmt = this.getConnection().prepareStatement(sql);
+			if (params != null) {
+				for (int i=0; i<params.length; ++i) {
+					stmt.setObject(i+1, params[i]);
+				}
+			}
+			
+			List<Record> list = new ArrayList<Record>();
+			Schema schema = null;
+			ResultSet rs= stmt.executeQuery();
+			while (rs.next()) {
+				java.sql.ResultSetMetaData meta = rs.getMetaData();
+				if (schema == null) {
+					schema = new Schema("temp");
+					for (int i=0; i<meta.getColumnCount(); i++) {
+						String name = meta.getColumnLabel(i+1);
+						String type = meta.getColumnTypeName(i+1);
+//						String clz = meta.getColumnClassName(i+1);
+						Field f = new Field(name.toLowerCase(), type);
+						schema.add(f);
+					}
+				}
+				Record r = schema.newInstance();
+				for (int i=0; i<meta.getColumnCount(); i++) {
+					if (meta.getColumnType(i+1) == java.sql.Types.CLOB) {
+						r.set(i, rs.getString(i+1));
+					}
+					else {
+						r.set(i, rs.getObject(i+1));
+					}
+				}
+				list.add(r);
+			}
+			rs.close();
+			return list;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////

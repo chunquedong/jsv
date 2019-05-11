@@ -2,6 +2,7 @@ package chunquedong.jsv.record.test;
 
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -10,6 +11,7 @@ import org.junit.Test;
 
 import chunquedong.jsv.record.ConnectionFactory;
 import chunquedong.jsv.record.Context;
+import chunquedong.jsv.record.model.Record;
 import chunquedong.jsv.record.model.Schema;
 
 public class BaseTest {
@@ -97,12 +99,20 @@ public class BaseTest {
 		Assert.assertEquals(t3.getAge(), 25);
 	}
 	
+	private void testQuery() {
+		List<Record> res = cx().query("select * from Teacher where age>?", new Object[]{ 10 });
+		for (Record r : res) {
+			System.out.println(r);
+		}
+	}
+	
 	@Test
 	public void test() {
 		buildTable();
 		insert();
 		query();
 		update();
+		testQuery();
 	}
 
 }

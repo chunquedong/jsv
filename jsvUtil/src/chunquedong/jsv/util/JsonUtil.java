@@ -14,6 +14,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
 
+import chunquedong.jsv.record.model.ArrayRecord;
 import chunquedong.jsv.record.model.DataType;
 import chunquedong.jsv.record.model.Field;
 import chunquedong.jsv.record.model.Record;
@@ -76,6 +77,11 @@ public class JsonUtil {
 				continue;
 			if ((f.getModifiers() & Modifier.PRIVATE) != 0)
 				continue;
+			
+			if (clz == ArrayRecord.class && f.getName().equals("values")) {
+				continue;
+			}
+			
 			if (Record.class.isAssignableFrom(f.getType())) {
 				try {
 					Record v = (Record) (f.get(r));
@@ -137,6 +143,9 @@ public class JsonUtil {
 		}
 		else if (o instanceof Integer) {
 			return ((Integer)o).toString();
+		}
+		else if (o instanceof Short) {
+			return ((Short)o).toString();
 		}
 		else if (o instanceof Float) {
 			return ((Float)o).toString();
