@@ -13,6 +13,7 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 
 import chunquedong.jsv.record.model.ArrayRecord;
 import chunquedong.jsv.record.model.DataType;
@@ -22,50 +23,24 @@ import chunquedong.jsv.record.model.Schema;
 
 public class JsonUtil {
 
-	public static String toJson(List<Record> list) {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[\n");
-		for (int i = 0; i < list.size(); ++i) {
-			if (i > 0) {
-				sb.append(",\n");
-			}
-			Record r = list.get(i);
-			sb.append("  ");
-			toJson(r, sb);
-		}
-		sb.append("]");
-		return sb.toString();
-	}
-
-	public static String toJson(Record r) {
-		StringBuilder sb = new StringBuilder();
-		toJson(r, sb);
-		return sb.toString();
-	}
-
-	public static void toJson(Record r, StringBuilder sb) {
-		sb.append("{");
+	private static void toRecordJson(Record r, StringBuilder sb, int level) {
+		sb.append('{');
+		indent(sb, level);
 		Schema table = r.getSchema();
-		sb.append("\"__typeName__\":\"").append(table.getName()).append("\"");
+		sb.append("\"__typeName__\":\"").append(table.getName()).append("\",");
+		
 		for (int i = 0; i < table.size(); ++i) {
 			if (r.get(i) == null) {
 				continue;
 			}
+			indent(sb, level);
 			Field f = table.get(i);
 			String name = f.getName();
-			sb.append(",\"").append(name).append("\":");
-
-//			if (f.getType() == DataType.jbyteArray) {
-//				String code = (Base64.encode((byte[]) r.get(i)));
-//				sb.append("\"").append(code).append("\"");
-//			} else {
-//				String val = quote(r.get(i).toString());
-//				sb.append(val);
-//			}
-//			
+			toJson(name, sb, level+1);
+			sb.append(':');
 			Object v = r.get(i);
-			String sv = toJson(v);
-			sb.append(sv);
+			toJson(v, sb, level+1);
+			sb.append(',');
 		}
 
 		Class<?> clz = r.getClass();
@@ -82,104 +57,124 @@ public class JsonUtil {
 				continue;
 			}
 			
-			if (Record.class.isAssignableFrom(f.getType())) {
-				try {
-					Record v = (Record) (f.get(r));
-					if (v == null)
-						continue;
-					sb.append(",\"").append(f.getName()).append("\":");
-					toJson(v, sb);
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			} else if (List.class.isAssignableFrom(f.getType())) {
-				try {
-					List<?> list = (List<?>) (f.get(r));
-					if (list == null)
-						continue;
-					sb.append(",\"").append(f.getName()).append("\":");
-					sb.append("[\n");
-					boolean first = true;
-					for (int i = 0; i < list.size(); ++i) {
-						Object o = list.get(i);
-						if (o instanceof Record) {
-							if (!first)
-								sb.append(",\n");
-							toJson((Record) (o), sb);
-							first = false;
-						}
-					}
-					sb.append("]");
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			}
-			else {
-				try {
-					Object v = f.get(r);
-					sb.append(",\"").append(f.getName()).append("\":");
-					String sv = toJson(v);
-					sb.append(sv);
-				} catch (IllegalArgumentException e) {
-					e.printStackTrace();
-				} catch (IllegalAccessException e) {
-					e.printStackTrace();
-				}
+			Object val;
+			try {
+				val = f.get(r);
+				if (val == null) continue;
+				indent(sb, level);
+				toJson(f.getName(), sb, level+1);
+				sb.append(':');
+				toJson(val, sb, level+1);
+				sb.append(',');
+			} catch (IllegalArgumentException e) {
+				e.printStackTrace();
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
 			}
 		}
+		
+		if (sb.charAt(sb.length()-1) ==',')
+			sb.deleteCharAt(sb.length()-1);
+		
+		indent(sb, level);
 		sb.append("}");
 	}
 	
 	public static String toJson(Object o) {
+		StringBuilder sb = new StringBuilder();
+		toJson(o, sb, 0);
+		return sb.toString();
+	}
+	
+	private static void indent(StringBuilder sb, int level) {
+		sb.append('\n');
+		for (int i=0; i<level; ++i) {
+			sb.append("  ");
+		}
+	}
+	
+	static void toJson(Object o, StringBuilder sb, int level) {
+		
 		if (o == null) {
-			return "null";
+			sb.append("null");
 		}
 		else if (o instanceof String) {
-			return quote((String)o);
+			sb.append(quote((String)o));
 		}
 		else if (o instanceof Integer) {
-			return ((Integer)o).toString();
+			sb.append( ((Integer)o).toString());
 		}
 		else if (o instanceof Short) {
-			return ((Short)o).toString();
+			sb.append( ((Short)o).toString());
 		}
 		else if (o instanceof Float) {
-			return ((Float)o).toString();
+			sb.append( ((Float)o).toString());
 		}
 		else if (o instanceof Double) {
-			return ((Double)o).toString();
+			sb.append( ((Double)o).toString());
 		}
 		else if (o instanceof Long) {
-			return ((Long)o).toString();
+			sb.append( ((Long)o).toString());
 		}
 		else if (o instanceof Boolean) {
-			return ((Boolean)o).toString();
+			sb.append( ((Boolean)o).toString());
 		}
 		else if (o instanceof Byte) {
-			return ((Byte)o).toString();
+			sb.append( ((Byte)o).toString());
 		}
 		else if (o instanceof byte[]) {
 			String code = (Base64.encode((byte[]) o));
-			return "\""+code + "\"";
+			sb.append( "\""+code + "\"");
 		}
 		else if (o instanceof Date) {
 			long t = ((Date)o).getTime();
-			return ""+t;
+			sb.append( ""+t);
 		}
 		else if (o instanceof Time) {
 			long t = ((Time)o).getTime();
-			return ""+t;
+			sb.append( ""+t);
 		}
 		else if (o instanceof Timestamp) {
 			long t = ((Timestamp)o).getTime();
-			return ""+t;
+			sb.append( ""+t);
+		}
+		else if (o instanceof Record) {
+			toRecordJson((Record)o, sb, level);
+		}
+		else if (o instanceof Map) {
+			boolean first = true;
+			sb.append('{');
+			indent(sb, level);
+			for (Map.Entry e : ((Map<?,?>)o).entrySet()) {
+				if (!first) {
+					sb.append(',');
+				} else {
+					first = false;
+				}
+				indent(sb, level);
+				toJson(e.getKey(), sb, level+1);
+				sb.append(':');
+				toJson(e.getValue(), sb, level+1);
+			}
+			indent(sb, level);
+			sb.append('}');
+		}
+		else if (o instanceof List) {
+			List list = (List)o;
+			sb.append('[');
+			indent(sb, level);
+			for (int i=0; i<list.size(); ++i) {
+				if (i>0) {
+					sb.append(',');
+				}
+				indent(sb, level);
+				toJson(list.get(i), sb, level+1);
+			}
+			indent(sb, level);
+			sb.append(']');
 		}
 		else {
-			return  "\""+o.toString() + "\"";
+			toJson(o.toString(), sb, level+1);
 		}
 	}
 
@@ -203,10 +198,10 @@ public class JsonUtil {
 				sb.append('\\');
 				sb.append(c);
 				break;
-			case '/':
-				sb.append('\\');
-				sb.append(c);
-				break;
+//			case '/':
+//				sb.append('\\');
+//				sb.append(c);
+//				break;
 			case '\b':
 				sb.append("\\b");
 				break;

@@ -190,4 +190,16 @@ public class ArrayRecord implements Record {
 		Object obj = DataType.fromDate(field.getType(), val);
 		set(i, obj);
 	}
+	
+	public void increaseField(String field) {
+		int i = getAsInt(field);
+		setAsInt(field, i+1);
+	}
+	
+	public void decreaseField(String field) {
+		int i = getAsInt(field);
+		--i;
+		if (i < 0) i = 0;
+		setAsInt(field, i);
+	}
 }

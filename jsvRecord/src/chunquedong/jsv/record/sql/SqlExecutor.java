@@ -36,7 +36,7 @@ public class SqlExecutor {
 		PreparedStatement stmt = null;
 		ResultSet set = null;
 		try {
-			stmt = db.prepareStatement(sql);
+			stmt = db.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 			for (int i=0; i<params.length; ++i) {
 				stmt.setObject(i+1, params[i]);
 			}
