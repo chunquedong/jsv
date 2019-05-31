@@ -67,6 +67,8 @@ public class ArrayRecord implements Record {
 					val = DataType.fromString(type, (String) val);
 				} else if (val instanceof Date) {
 					val = DataType.fromDate(type, (Date) val);
+				} else if (val instanceof java.math.BigInteger){
+					val = ((java.math.BigInteger)val).longValue();
 				} else {
 					throw new RuntimeException("type miss match, expected:"
 							+ DataType.getClass(schema.get(i).getType())
