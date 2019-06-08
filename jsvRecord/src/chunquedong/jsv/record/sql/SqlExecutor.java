@@ -20,7 +20,7 @@ import chunquedong.jsv.record.model.*;
 import chunquedong.jsv.record.sql.dialect.SqlDialect;
 
 public class SqlExecutor {
-	static Logger log = Logger.getLogger("jsvRecord");
+	public static Logger log = Logger.getLogger("jsvRecord");
 	public SqlDialect dialect = new SqlDialect();
 
 	public void insert(Schema table, Connection db, Object obj)

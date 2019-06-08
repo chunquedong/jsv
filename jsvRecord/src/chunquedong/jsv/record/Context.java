@@ -13,7 +13,9 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 
 import chunquedong.jsv.record.connect.DbUtil;
 import chunquedong.jsv.record.model.*;
@@ -134,6 +136,12 @@ public class Context {
 				for (int i=0; i<params.length; ++i) {
 					stmt.setObject(i+1, params[i]);
 				}
+			}
+			
+			if (SqlExecutor.log.isLoggable(Level.FINE))
+			{
+				SqlExecutor.log.fine(sql);
+				SqlExecutor.log.fine(Arrays.toString(params));
 			}
 			
 			List<Record> list = new ArrayList<Record>();
